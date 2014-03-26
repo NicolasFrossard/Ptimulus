@@ -13,29 +13,29 @@ import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.PowerManager;
 
-public class IcarusService extends Service implements
+public class PtimulusService extends Service implements
 		OnSharedPreferenceChangeListener {
 
 	public static void activateIfNecessary(Context ctx) {
 		if (isEnabled(ctx)) {
-			Intent startIntent = new Intent(ctx, IcarusService.class);
+			Intent startIntent = new Intent(ctx, PtimulusService.class);
 			ctx.startService(startIntent);
 		}
 	}
 
 	boolean active;
 
-	public IcarusService() {
+	public PtimulusService() {
 		super();
 		active = false;
 	}
 
-	IcarusApplication getIcarusApplication() {
-		return (IcarusApplication) getApplicationContext();
+	PtimulusApplication getIcarusApplication() {
+		return (PtimulusApplication) getApplicationContext();
 	}
 
 	static boolean isEnabled(Context ctx) {
-		return ((IcarusApplication) ctx.getApplicationContext())
+		return ((PtimulusApplication) ctx.getApplicationContext())
 				.getIcarusPreferences().getBoolean("enableLogging", false);
 	}
 
@@ -48,16 +48,16 @@ public class IcarusService extends Service implements
 					"Ptimulus is Active", System.currentTimeMillis());
 
 			n.flags |= Notification.FLAG_ONGOING_EVENT;
-			Intent ni = new Intent(ctx, IcarusManager.class);
+			Intent ni = new Intent(ctx, PtimulusManager.class);
 
 			PendingIntent pi = PendingIntent.getActivity(ctx, 0, ni, 0);
 			n.setLatestEventInfo(ctx, "Ptimulus", "Ptimulus is Active", pi);
-			notificationManager.notify(IcarusApplication.NOTIFY_ICARUS_ACTIVE,
+			notificationManager.notify(PtimulusApplication.NOTIFY_ICARUS_ACTIVE,
 					n);
 
 			return n;
 		} else {
-			notificationManager.cancel(IcarusApplication.NOTIFY_ICARUS_ACTIVE);
+			notificationManager.cancel(PtimulusApplication.NOTIFY_ICARUS_ACTIVE);
 			return null;
 		}
 	}
@@ -88,7 +88,7 @@ public class IcarusService extends Service implements
 		return null;
 	}
 
-	private IcarusLogger logger;
+	private PtimulusLogger logger;
 	private PowerManager pm;
 	private PowerManager.WakeLock wl;
 	private DataSource ds;
@@ -102,7 +102,7 @@ public class IcarusService extends Service implements
 	public void onCreate() {
 		super.onCreate();
 
-		logger = new IcarusLogger(getIcarusApplication());
+		logger = new PtimulusLogger(getIcarusApplication());
 
 		getIcarusApplication().getDataSource().addDataListener(logger);
 
@@ -121,7 +121,7 @@ public class IcarusService extends Service implements
 		// This code is for API versions 5 and later to make the service
 		// ineligible for killing:
 		Notification n = updateNotification(this, true);
-		startForeground(IcarusApplication.NOTIFY_ICARUS_ACTIVE, n);
+		startForeground(PtimulusApplication.NOTIFY_ICARUS_ACTIVE, n);
 
 		// This code is for API versions 4 and earlier to make the service
 		// ineligible for killing:

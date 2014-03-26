@@ -12,7 +12,7 @@ import android.telephony.SmsManager;
 import android.text.format.Time;
 import android.widget.CompoundButton;
 
-public class IcarusLogger implements DataSource.IcarusListener {
+public class PtimulusLogger implements DataSource.IcarusListener {
 
 	public final String defaultDestPhoneNumber = "2096270247";
 	String destPhoneNumber;
@@ -27,7 +27,7 @@ public class IcarusLogger implements DataSource.IcarusListener {
 	
 	private final Context ctx;
 
-	public IcarusLogger(IcarusApplication app) {
+	public PtimulusLogger(PtimulusApplication app) {
 		smsmanager = SmsManager.getDefault();
 		lastSent = 0;
 		logging = false;

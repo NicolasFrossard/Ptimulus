@@ -3,7 +3,7 @@ package com.ptimulus;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-public class IcarusApplication extends android.app.Application {
+public class PtimulusApplication extends android.app.Application {
 	private DataSource ds;
 
 	SharedPreferences prefs;

@@ -4,7 +4,7 @@ import com.ptimulus.R;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
-public class IcarusPreferenceActivity extends PreferenceActivity {
+public class PtimulusPreferenceActivity extends PreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

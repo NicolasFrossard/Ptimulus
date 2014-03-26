@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class IcarusManager extends Activity implements
+public class PtimulusManager extends Activity implements
 		DataSource.IcarusListener {
 
 	private TextView tv;
@@ -33,8 +33,8 @@ public class IcarusManager extends Activity implements
 		t.setText(name + " " + data);
 	}
 
-	public IcarusApplication getIcarusApplication() {
-		return (IcarusApplication) getApplicationContext();
+	public PtimulusApplication getIcarusApplication() {
+		return (PtimulusApplication) getApplicationContext();
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class IcarusManager extends Activity implements
 	public void onResume() {
 		super.onResume();
 		getIcarusApplication().getDataSource().addDataListener(this);
-		IcarusService.activateIfNecessary(this);
+		PtimulusService.activateIfNecessary(this);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class IcarusManager extends Activity implements
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		startActivity(new Intent(this, IcarusPreferenceActivity.class));
+		startActivity(new Intent(this, PtimulusPreferenceActivity.class));
 		return (true);
 	}
 
