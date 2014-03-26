@@ -12,7 +12,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.ptimulus.IcarusPreferenceActivity"
-        android:label="Icarus Preferences"/>
+        android:label="Ptimulus Preferences"/>
 <receiver android:name="com.ptimulus.IcarusAutoStarter">
             
             <intent-filter>

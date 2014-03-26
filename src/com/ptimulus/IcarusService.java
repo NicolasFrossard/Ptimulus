@@ -44,14 +44,14 @@ public class IcarusService extends Service implements
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		if (enabled) {
-			Notification n = new Notification(R.drawable.icaruslogo,
-					"Icarus Active", System.currentTimeMillis());
+			Notification n = new Notification(R.drawable.ptimuluslogo,
+					"Ptimulus is Active", System.currentTimeMillis());
 
 			n.flags |= Notification.FLAG_ONGOING_EVENT;
 			Intent ni = new Intent(ctx, IcarusManager.class);
 
 			PendingIntent pi = PendingIntent.getActivity(ctx, 0, ni, 0);
-			n.setLatestEventInfo(ctx, "Icarus", "Icarus Active", pi);
+			n.setLatestEventInfo(ctx, "Ptimulus", "Ptimulus is Active", pi);
 			notificationManager.notify(IcarusApplication.NOTIFY_ICARUS_ACTIVE,
 					n);
 
@@ -70,7 +70,7 @@ public class IcarusService extends Service implements
 		wl.acquire();
 		active = true;
 
-		MediaPlayer mp = MediaPlayer.create(ctx, R.raw.icarusactivated);
+		MediaPlayer mp = MediaPlayer.create(ctx, R.raw.ready);
 		mp.start();
 	}
 
