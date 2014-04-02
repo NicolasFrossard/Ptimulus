@@ -76,12 +76,12 @@ public class DataSource implements LocationListener {
 	private TelephonyManager telephonyManager;
 	private String locationProvider;
 
-	public void addDataListener(IPtimulusLogger newListener) {
-		listeners.add(newListener);
+	public void addLogger(IPtimulusLogger logger) {
+		listeners.add(logger);
 	}
 
-	public void removeDataListener(IPtimulusLogger oldListener) {
-		listeners.remove(oldListener);
+	public void removeLogger(IPtimulusLogger logger) {
+		listeners.remove(logger);
 	}
 
 	private final Context ctx;
@@ -127,9 +127,7 @@ public class DataSource implements LocationListener {
 					this.gsmState == ServiceState.STATE_IN_SERVICE);
 	}
 
-	public void onLocationChanged(Location l) {
-		//Toast.makeText(ctx, "OMAGAD long: " + l.getLongitude() + " and lat: " + l.getLatitude(), Toast.LENGTH_LONG).show();
-		
+	public void onLocationChanged(Location l) {		
 		Date d = new Date(l.getTime());
 		
 		logDataEvent("gps", l.getLatitude() + "," + l.getLongitude() + " "

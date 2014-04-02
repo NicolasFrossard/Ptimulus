@@ -22,6 +22,7 @@ public class PtimulusManager extends Activity implements
 
 	public void logDataEvent(String name, String data, long ts,
 			boolean hasService) {
+		
 		if (ts > 0)
 			tv.setText("GPS Timestamp: " + ts + " Cell service: "
 					+ (hasService ? "yes" : "no"));
@@ -63,13 +64,13 @@ public class PtimulusManager extends Activity implements
 	@Override
 	public void onPause() {
 		super.onPause();
-		getIcarusApplication().getDataSource().removeDataListener(this);
+		getIcarusApplication().getDataSource().removeLogger(this);
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		getIcarusApplication().getDataSource().addDataListener(this);
+		getIcarusApplication().getDataSource().addLogger(this);
 		PtimulusService.activateIfNecessary(this);
 	}
 
@@ -87,15 +88,9 @@ public class PtimulusManager extends Activity implements
 	}
 
 	@Override
-	public void startLogging() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void startLogging() {}
 
 	@Override
-	public void stopLogging() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void stopLogging() {}
 
 }

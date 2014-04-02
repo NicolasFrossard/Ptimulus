@@ -127,7 +127,7 @@ public class PtimulusService extends Service implements
 		loggers.add(new ScreenLogger(getIcarusApplication()));
 
 		for(IPtimulusLogger logger : loggers) {
-			getIcarusApplication().getDataSource().addDataListener(logger);
+			getIcarusApplication().getDataSource().addLogger(logger);
 		}
 		
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
