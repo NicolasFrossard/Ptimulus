@@ -17,6 +17,7 @@ import android.os.PowerManager;
 
 import com.ptimulus.log.FileLogger;
 import com.ptimulus.log.IPtimulusLogger;
+import com.ptimulus.log.ScreenLogger;
 import com.ptimulus.log.SmsLogger;
 
 public class PtimulusService extends Service implements
@@ -123,6 +124,7 @@ public class PtimulusService extends Service implements
 
 		loggers.add(new SmsLogger(getIcarusApplication()));
 		loggers.add(new FileLogger());
+		loggers.add(new ScreenLogger(getIcarusApplication()));
 
 		for(IPtimulusLogger logger : loggers) {
 			getIcarusApplication().getDataSource().addDataListener(logger);

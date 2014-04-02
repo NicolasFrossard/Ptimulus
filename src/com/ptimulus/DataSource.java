@@ -128,7 +128,7 @@ public class DataSource implements LocationListener {
 	}
 
 	public void onLocationChanged(Location l) {
-		Toast.makeText(ctx, "OMAGAD long: " + l.getLongitude() + " and lat: " + l.getLatitude(), Toast.LENGTH_LONG).show();
+		//Toast.makeText(ctx, "OMAGAD long: " + l.getLongitude() + " and lat: " + l.getLatitude(), Toast.LENGTH_LONG).show();
 		
 		Date d = new Date(l.getTime());
 		
