@@ -2,6 +2,8 @@ package com.ptimulus;
 
 import java.util.HashMap;
 
+import com.ptimulus.log.IPtimulusLogger;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class PtimulusManager extends Activity implements
-		DataSource.IcarusListener {
+		IPtimulusLogger {
 
 	private TextView tv;
 	private LinearLayout ll;
@@ -82,6 +84,18 @@ public class PtimulusManager extends Activity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		startActivity(new Intent(this, PtimulusPreferenceActivity.class));
 		return (true);
+	}
+
+	@Override
+	public void startLogging() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void stopLogging() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

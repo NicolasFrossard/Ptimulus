@@ -1,6 +1,8 @@
 package com.ptimulus;
 
-import com.ptimulus.R;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,6 +15,10 @@ import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.PowerManager;
 
+import com.ptimulus.log.FileLogger;
+import com.ptimulus.log.IPtimulusLogger;
+import com.ptimulus.log.SmsLogger;
+
 public class PtimulusService extends Service implements
 		OnSharedPreferenceChangeListener {
 
@@ -22,6 +28,8 @@ public class PtimulusService extends Service implements
 			ctx.startService(startIntent);
 		}
 	}
+	
+	private final List<IPtimulusLogger> loggers = new ArrayList<IPtimulusLogger>();
 
 	boolean active;
 
@@ -51,7 +59,7 @@ public class PtimulusService extends Service implements
 			Intent ni = new Intent(ctx, PtimulusManager.class);
 
 			PendingIntent pi = PendingIntent.getActivity(ctx, 0, ni, 0);
-			n.setLatestEventInfo(ctx, "Ptimulus", "Ptimulus is Active", pi);
+			n.setLatestEventInfo(ctx, "Ptimulus", "Ptimulus is active", pi);
 			notificationManager.notify(PtimulusApplication.NOTIFY_ICARUS_ACTIVE,
 					n);
 
@@ -66,7 +74,11 @@ public class PtimulusService extends Service implements
 		if (active)
 			return;
 		ds.start();
-		logger.startLogging();
+		
+		for(IPtimulusLogger logger : loggers) {
+			logger.startLogging();	
+		}
+		
 		wl.acquire();
 		active = true;
 
@@ -78,7 +90,11 @@ public class PtimulusService extends Service implements
 		if (!active)
 			return;
 		ds.stop();
-		logger.stopLogging();
+
+		for(IPtimulusLogger logger : loggers) {
+			logger.stopLogging();	
+		}
+		
 		wl.release();
 		active = false;
 	}
@@ -88,24 +104,30 @@ public class PtimulusService extends Service implements
 		return null;
 	}
 
-	private PtimulusLogger logger;
+	//private PtimulusLogger logger;
 	private PowerManager pm;
 	private PowerManager.WakeLock wl;
 	private DataSource ds;
 
 	public void logDataEvent(String name, String data, long ts,
 			boolean hasService) {
-		logger.logDataEvent(name, data, ts, hasService);
+		
+		for(IPtimulusLogger logger : loggers) {
+			logger.logDataEvent(name, data, ts, hasService);
+		}
 	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 
-		logger = new PtimulusLogger(getIcarusApplication());
+		loggers.add(new SmsLogger(getIcarusApplication()));
+		loggers.add(new FileLogger());
 
-		getIcarusApplication().getDataSource().addDataListener(logger);
-
+		for(IPtimulusLogger logger : loggers) {
+			getIcarusApplication().getDataSource().addDataListener(logger);
+		}
+		
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "IcarusMission");
 		ds = getIcarusApplication().getDataSource();

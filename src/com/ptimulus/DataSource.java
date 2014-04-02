@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.ptimulus.log.IPtimulusLogger;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -20,12 +22,7 @@ import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
 public class DataSource implements LocationListener {
-	interface IcarusListener {
-		public void logDataEvent(String name, String data, long ts,
-				boolean gsmOk);
-	};
-
-	LinkedList<IcarusListener> listeners;
+	LinkedList<IPtimulusLogger> listeners;
 
 	private class SensorEventAdapter implements SensorEventListener {
 		private DataSource ds;
@@ -79,18 +76,18 @@ public class DataSource implements LocationListener {
 	private TelephonyManager telephonyManager;
 	private String locationProvider;
 
-	public void addDataListener(IcarusListener newListener) {
+	public void addDataListener(IPtimulusLogger newListener) {
 		listeners.add(newListener);
 	}
 
-	public void removeDataListener(IcarusListener oldListener) {
+	public void removeDataListener(IPtimulusLogger oldListener) {
 		listeners.remove(oldListener);
 	}
 
 	private final Context ctx;
 	
 	public DataSource(Context ctx) {
-		listeners = new LinkedList<IcarusListener>();
+		listeners = new LinkedList<IPtimulusLogger>();
 
 		this.ctx = ctx; 
 		
@@ -125,7 +122,7 @@ public class DataSource implements LocationListener {
 	}
 
 	public void logDataEvent(String name, String data, long ts) {
-		for (IcarusListener listener : listeners)
+		for (IPtimulusLogger listener : listeners)
 			listener.logDataEvent(name, data, ts,
 					this.gsmState == ServiceState.STATE_IN_SERVICE);
 	}

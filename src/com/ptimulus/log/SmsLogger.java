@@ -1,38 +1,30 @@
-package com.ptimulus;
+package com.ptimulus.log;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import android.content.Context;
 import android.telephony.SmsManager;
 import android.text.format.Time;
 import android.widget.CompoundButton;
 
-public class PtimulusLogger implements DataSource.IcarusListener {
+import com.ptimulus.PtimulusApplication;
+
+public class SmsLogger implements IPtimulusLogger {
 
 	public final String defaultDestPhoneNumber = "2096270247";
 	String destPhoneNumber;
-	final String logfileName = "IcarusLogTestKK";
 	final long sendInterval = 0;
 
-	private PrintWriter file;
 	private SmsManager smsmanager;
 	private long lastSent;
 	
 	private boolean logging;
 	
-	private final Context ctx;
+	//private final Context ctx;
 
-	public PtimulusLogger(PtimulusApplication app) {
+	public SmsLogger(PtimulusApplication app) {
 		smsmanager = SmsManager.getDefault();
-		lastSent = 0;
+		//lastSent = 0;
 		logging = false;
 		
-		ctx = app.getApplicationContext();
+		//ctx = app.getApplicationContext();
 		
 		destPhoneNumber = app.getIcarusPreferences().getString(
 				"targetPhoneNumber", defaultDestPhoneNumber);
@@ -55,10 +47,6 @@ public class PtimulusLogger implements DataSource.IcarusListener {
 			e.printStackTrace();
 		}*/
 		
-		file.println(System.currentTimeMillis() + " " + name + ": " + data
-				+ " " + ts);
-		file.flush();
-
 		if (name != "gps") // only send SMS for gps coords
 			return;
 
@@ -82,7 +70,7 @@ public class PtimulusLogger implements DataSource.IcarusListener {
 		try {
 			Time t = new Time();
 			t.setToNow();
-			File f = new File("/sdcard", logfileName);
+			
 			/*
 			try {
 				f.createNewFile();
@@ -90,7 +78,6 @@ public class PtimulusLogger implements DataSource.IcarusListener {
 				throw new RuntimeException(e);
 			}
 			*/
-			file = new PrintWriter(new FileOutputStream(f, true));
 			
 			//FileWriter fw = new FileWriter(f, true);
 			//fw.write("kikoo");
@@ -105,7 +92,6 @@ public class PtimulusLogger implements DataSource.IcarusListener {
 	public void stopLogging() {
 		if (logging)
 			return;
-		file.close();
 		logging = false;
 	}
 
