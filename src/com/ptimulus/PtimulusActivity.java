@@ -2,9 +2,12 @@ package com.ptimulus;
 
 import java.util.HashMap;
 
+import com.ptimulus.device.LocationEventHandler;
 import com.ptimulus.log.IPtimulusLogger;
+import com.ptimulus.log.LogEntryType;
 
 import android.app.Activity;
+import android.app.LocalActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,29 +15,39 @@ import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class PtimulusManager extends Activity implements
-		IPtimulusLogger {
+public class PtimulusActivity extends Activity {
 
 	private TextView tv;
 	private LinearLayout ll;
 	private int index;
 	private HashMap<String, TextView> dataViews;
 
-	public void logDataEvent(String name, String data, long ts,
-			boolean hasService) {
+	private boolean logging;
+	
+	public void updateLocation(String newLocation, long timestamp) {
+		if(!logging) return;
 		
-		if (ts > 0)
-			tv.setText("GPS Timestamp: " + ts + " Cell service: "
+		tv.setText("Last GPS received at " + timestamp + ": " + newLocation);
+		
+	}
+	
+	/*
+	public void logDataEvent(LogEntryType type, String data, long timestamp) {
+		
+		if(!logging) return;
+		
+		if (timestamp > 0)
+			tv.setText("GPS Timestamp: " + timestamp + " Cell service: ");
 					+ (hasService ? "yes" : "no"));
 		TextView t;
-		if (!dataViews.containsKey(name)) {
+		if (!dataViews.containsKey(type.toString())) {
 			t = new TextView(this);
 			ll.addView(t, index++);
-			dataViews.put(name, t);
+			dataViews.put(type.toString(), t);
 		} else
-			t = dataViews.get(name);
-		t.setText(name + " " + data);
-	}
+			t = dataViews.get(type.toString());
+		t.setText(type + " " + data);
+	}*/
 
 	public PtimulusApplication getIcarusApplication() {
 		return (PtimulusApplication) getApplicationContext();
@@ -58,19 +71,21 @@ public class PtimulusManager extends Activity implements
 		setContentView(ll);
 
 		dataViews = new HashMap<String, TextView>();
+		
+		LocationEventHandler.registerActivity(this);
 
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		getIcarusApplication().getDataSource().removeLogger(this);
+		logging = false;
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		getIcarusApplication().getDataSource().addLogger(this);
+		logging = true;
 		PtimulusService.activateIfNecessary(this);
 	}
 
@@ -86,11 +101,5 @@ public class PtimulusManager extends Activity implements
 		startActivity(new Intent(this, PtimulusPreferenceActivity.class));
 		return (true);
 	}
-
-	@Override
-	public void startLogging() {}
-
-	@Override
-	public void stopLogging() {}
 
 }

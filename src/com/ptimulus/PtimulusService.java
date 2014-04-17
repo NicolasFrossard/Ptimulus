@@ -15,6 +15,7 @@ import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.PowerManager;
 
+import com.ptimulus.device.LocationEventHandler;
 import com.ptimulus.log.FileLogger;
 import com.ptimulus.log.IPtimulusLogger;
 import com.ptimulus.log.ScreenLogger;
@@ -23,6 +24,11 @@ import com.ptimulus.log.SmsLogger;
 public class PtimulusService extends Service implements
 		OnSharedPreferenceChangeListener {
 
+	private PowerManager pm;
+	private PowerManager.WakeLock wl;
+	
+	private LocationEventHandler locationEventHandler;
+	
 	public static void activateIfNecessary(Context ctx) {
 		if (isEnabled(ctx)) {
 			Intent startIntent = new Intent(ctx, PtimulusService.class);
@@ -57,7 +63,7 @@ public class PtimulusService extends Service implements
 					"Ptimulus is Active", System.currentTimeMillis());
 
 			n.flags |= Notification.FLAG_ONGOING_EVENT;
-			Intent ni = new Intent(ctx, PtimulusManager.class);
+			Intent ni = new Intent(ctx, PtimulusActivity.class);
 
 			PendingIntent pi = PendingIntent.getActivity(ctx, 0, ni, 0);
 			n.setLatestEventInfo(ctx, "Ptimulus", "Ptimulus is active", pi);
@@ -74,7 +80,7 @@ public class PtimulusService extends Service implements
 	public void start(Context ctx) {
 		if (active)
 			return;
-		ds.start();
+		locationEventHandler.start();
 		
 		for(IPtimulusLogger logger : loggers) {
 			logger.startLogging();	
@@ -90,7 +96,7 @@ public class PtimulusService extends Service implements
 	public void stop() {
 		if (!active)
 			return;
-		ds.stop();
+		locationEventHandler.stop();
 
 		for(IPtimulusLogger logger : loggers) {
 			logger.stopLogging();	
@@ -105,11 +111,6 @@ public class PtimulusService extends Service implements
 		return null;
 	}
 
-	//private PtimulusLogger logger;
-	private PowerManager pm;
-	private PowerManager.WakeLock wl;
-	private DataSource ds;
-
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -118,14 +119,11 @@ public class PtimulusService extends Service implements
 		loggers.add(new FileLogger());
 		loggers.add(new ScreenLogger(getIcarusApplication()));
 
-		for(IPtimulusLogger logger : loggers) {
-			getIcarusApplication().getDataSource().addLogger(logger);
-		}
-		
+		locationEventHandler = new LocationEventHandler(getIcarusApplication(), loggers);
+				
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "IcarusMission");
-		ds = getIcarusApplication().getDataSource();
-
+		
 		start(this);
 		getIcarusApplication().getIcarusPreferences()
 				.registerOnSharedPreferenceChangeListener(this);

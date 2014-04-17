@@ -34,12 +34,11 @@ public class ScreenLogger implements IPtimulusLogger {
 		smsmanager.sendTextMessage(destPhoneNumber, null, "Hello beautiful", null, null);*/
 	}
 
-	public void logDataEvent(String name, String data, long ts,
-			boolean hasService) {
+	public void logDataEvent(LogEntryType type, String data, long ts) {
 		if (!logging)
 			return;
 
-		Toast.makeText(ctx, "ScreenLog long: " + name + ": " + data, Toast.LENGTH_LONG).show();
+		Toast.makeText(ctx, "ScreenLog long: " + type + ": " + data, Toast.LENGTH_LONG).show();
 		
 		/*
 		FileOutputStream fos;
@@ -72,7 +71,7 @@ public class ScreenLogger implements IPtimulusLogger {
 
 	public void startLogging() {
 		logging = true;
-		this.logDataEvent("log", "Screen Logging Started", 0, false);
+		this.logDataEvent(LogEntryType.APP_LIFECYCLE, "Screen Logging Started", 0);
 	}
 
 	public void stopLogging() {

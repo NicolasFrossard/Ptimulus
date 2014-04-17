@@ -2,6 +2,7 @@ package com.ptimulus.log;
 
 import android.telephony.SmsManager;
 import android.text.format.Time;
+import android.util.Log;
 import android.widget.CompoundButton;
 
 import com.ptimulus.PtimulusApplication;
@@ -32,8 +33,7 @@ public class SmsLogger implements IPtimulusLogger {
 		smsmanager.sendTextMessage(destPhoneNumber, null, "Hello beautiful", null, null);
 	}
 
-	public void logDataEvent(String name, String data, long ts,
-			boolean hasService) {
+	public void logDataEvent(LogEntryType type, String data, long ts) {
 		if (!logging)
 			return;
 		
@@ -47,12 +47,12 @@ public class SmsLogger implements IPtimulusLogger {
 			e.printStackTrace();
 		}*/
 		
-		if (name != "gps") // only send SMS for gps coords
+		if (type != LogEntryType.GPS) // only send SMS for gps coords
 			return;
 
 		// send SMS if okay to do so
 		boolean sendIntervalExceeded = lastSent < (ts - sendInterval);
-		if (hasService && sendIntervalExceeded) {
+		if (/*hasService &&*/ sendIntervalExceeded) {
 			smsmanager.sendTextMessage(destPhoneNumber, null, data, null, null);
 			lastSent = ts;
 		}
@@ -86,7 +86,6 @@ public class SmsLogger implements IPtimulusLogger {
 			throw new RuntimeException(e);
 		}
 		logging = true;
-		this.logDataEvent("log", "Logging Started", 0, false);
 	}
 
 	public void stopLogging() {

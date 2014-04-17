@@ -25,12 +25,11 @@ public class FileLogger implements IPtimulusLogger {
 		logging = false;
 	}
 
-	public void logDataEvent(String name, String data, long ts,
-			boolean hasService) {
+	public void logDataEvent(LogEntryType type, String data, long ts) {
 		if (!logging)
 			return;
 		
-		file.println(System.currentTimeMillis() + " " + name + ": " + data
+		file.println(System.currentTimeMillis() + " " + type + ": " + data
 				+ " " + ts);
 		file.flush();
 
@@ -45,7 +44,7 @@ public class FileLogger implements IPtimulusLogger {
 			throw new RuntimeException(e);
 		}
 		logging = true;
-		this.logDataEvent("log", "File logging Started", 0, false);
+		this.logDataEvent(LogEntryType.APP_LIFECYCLE, "File logging Started", 0);
 	}
 
 	public void stopLogging() {
