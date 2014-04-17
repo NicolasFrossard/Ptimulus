@@ -16,7 +16,7 @@ import android.widget.CompoundButton;
 
 public class FileLogger implements IPtimulusLogger {
 
-	final String logfileName = "PtimulusLog.txt";
+	final String logfileName = "ptimulus.log";
 	private PrintWriter file;
 	
 	private boolean logging;

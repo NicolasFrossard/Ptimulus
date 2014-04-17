@@ -21,8 +21,14 @@ import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
+/**
+ * Has a list of loggers and log events for GPS and Sensors
+ * @author nicolas
+ *
+ */
 public class DataSource implements LocationListener {
-	LinkedList<IPtimulusLogger> listeners;
+	
+	LinkedList<IPtimulusLogger> loggers;
 
 	private class SensorEventAdapter implements SensorEventListener {
 		private DataSource ds;
@@ -77,17 +83,17 @@ public class DataSource implements LocationListener {
 	private String locationProvider;
 
 	public void addLogger(IPtimulusLogger logger) {
-		listeners.add(logger);
+		loggers.add(logger);
 	}
 
 	public void removeLogger(IPtimulusLogger logger) {
-		listeners.remove(logger);
+		loggers.remove(logger);
 	}
 
 	private final Context ctx;
 	
 	public DataSource(Context ctx) {
-		listeners = new LinkedList<IPtimulusLogger>();
+		loggers = new LinkedList<IPtimulusLogger>();
 
 		this.ctx = ctx; 
 		
@@ -117,12 +123,12 @@ public class DataSource implements LocationListener {
 
 	public void start() {
 		gps.requestLocationUpdates(locationProvider, 0, 0, this);
-		for (SensorEventAdapter s : adapterlist)
+		for (SensorEventAdapter s : adapterlist) 
 			s.startSensor();
 	}
 
 	public void logDataEvent(String name, String data, long ts) {
-		for (IPtimulusLogger listener : listeners)
+		for (IPtimulusLogger listener : loggers)
 			listener.logDataEvent(name, data, ts,
 					this.gsmState == ServiceState.STATE_IN_SERVICE);
 	}

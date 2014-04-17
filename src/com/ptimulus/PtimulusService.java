@@ -110,14 +110,6 @@ public class PtimulusService extends Service implements
 	private PowerManager.WakeLock wl;
 	private DataSource ds;
 
-	public void logDataEvent(String name, String data, long ts,
-			boolean hasService) {
-		
-		for(IPtimulusLogger logger : loggers) {
-			logger.logDataEvent(name, data, ts, hasService);
-		}
-	}
-
 	@Override
 	public void onCreate() {
 		super.onCreate();
