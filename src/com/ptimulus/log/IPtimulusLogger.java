@@ -3,7 +3,7 @@ package com.ptimulus.log;
 
 public interface IPtimulusLogger {
 
-	public void logDataEvent(LogEntryType type, String entry, long timestamp);
+	public void logDataEvent(LogEntryType type, String entry);
 	
 	public void startLogging();
 

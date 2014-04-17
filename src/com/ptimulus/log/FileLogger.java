@@ -1,18 +1,10 @@
 package com.ptimulus.log;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 
-import com.ptimulus.log.IPtimulusLogger;
-
-import android.content.Context;
-import android.telephony.SmsManager;
-import android.text.format.Time;
-import android.widget.CompoundButton;
+import com.ptimulus.utils.DateFactory;
 
 public class FileLogger implements IPtimulusLogger {
 
@@ -25,12 +17,11 @@ public class FileLogger implements IPtimulusLogger {
 		logging = false;
 	}
 
-	public void logDataEvent(LogEntryType type, String data, long ts) {
+	public void logDataEvent(LogEntryType type, String data) {
 		if (!logging)
 			return;
 		
-		file.println(System.currentTimeMillis() + " " + type + ": " + data
-				+ " " + ts);
+		file.println(DateFactory.nowAsString() + " | " + type + ": " + data	+ " ");
 		file.flush();
 
 	}
@@ -44,7 +35,7 @@ public class FileLogger implements IPtimulusLogger {
 			throw new RuntimeException(e);
 		}
 		logging = true;
-		this.logDataEvent(LogEntryType.APP_LIFECYCLE, "File logging Started", 0);
+		this.logDataEvent(LogEntryType.APP_LIFECYCLE, "File logging Started");
 	}
 
 	public void stopLogging() {

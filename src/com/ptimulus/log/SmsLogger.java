@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.CompoundButton;
 
 import com.ptimulus.PtimulusApplication;
+import com.ptimulus.utils.DateFactory;
 
 public class SmsLogger implements IPtimulusLogger {
 
@@ -27,13 +28,13 @@ public class SmsLogger implements IPtimulusLogger {
 		
 		//ctx = app.getApplicationContext();
 		
-		destPhoneNumber = app.getIcarusPreferences().getString(
+		destPhoneNumber = app.getPtimulusPreferences().getString(
 				"targetPhoneNumber", defaultDestPhoneNumber);
 		
 		smsmanager.sendTextMessage(destPhoneNumber, null, "Hello beautiful", null, null);
 	}
 
-	public void logDataEvent(LogEntryType type, String data, long ts) {
+	public void logDataEvent(LogEntryType type, String data) {
 		if (!logging)
 			return;
 		
@@ -51,10 +52,11 @@ public class SmsLogger implements IPtimulusLogger {
 			return;
 
 		// send SMS if okay to do so
-		boolean sendIntervalExceeded = lastSent < (ts - sendInterval);
+		Long now = DateFactory.nowAsLong();
+		boolean sendIntervalExceeded = lastSent < (now - sendInterval);
 		if (/*hasService &&*/ sendIntervalExceeded) {
 			smsmanager.sendTextMessage(destPhoneNumber, null, data, null, null);
-			lastSent = ts;
+			lastSent = now;
 		}
 	}
 

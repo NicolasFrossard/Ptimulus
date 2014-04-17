@@ -47,13 +47,13 @@ public class PtimulusService extends Service implements
 		active = false;
 	}
 
-	PtimulusApplication getIcarusApplication() {
+	PtimulusApplication getPtimulusApplication() {
 		return (PtimulusApplication) getApplicationContext();
 	}
 
 	static boolean isEnabled(Context ctx) {
 		return ((PtimulusApplication) ctx.getApplicationContext())
-				.getIcarusPreferences().getBoolean("enableLogging", false);
+				.getPtimulusPreferences().getBoolean("enableLogging", false);
 	}
 
 	static Notification updateNotification(Context ctx, boolean enabled) {
@@ -69,12 +69,12 @@ public class PtimulusService extends Service implements
 
 			PendingIntent pi = PendingIntent.getActivity(ctx, 0, ni, 0);
 			n.setLatestEventInfo(ctx, "Ptimulus", "Ptimulus is active", pi);
-			notificationManager.notify(PtimulusApplication.NOTIFY_ICARUS_ACTIVE,
+			notificationManager.notify(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE,
 					n);
 
 			return n;
 		} else {
-			notificationManager.cancel(PtimulusApplication.NOTIFY_ICARUS_ACTIVE);
+			notificationManager.cancel(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE);
 			return null;
 		}
 	}
@@ -117,18 +117,18 @@ public class PtimulusService extends Service implements
 	public void onCreate() {
 		super.onCreate();
 
-		loggers.add(new SmsLogger(getIcarusApplication()));
+		loggers.add(new SmsLogger(getPtimulusApplication()));
 		loggers.add(new FileLogger());
-		loggers.add(new ScreenLogger(getIcarusApplication()));
+		loggers.add(new ScreenLogger(getPtimulusApplication()));
 
-		locationEventHandler = new LocationEventHandler(getIcarusApplication(), loggers);
-		telephonyEventHandler = new TelephonyEventHandler(getIcarusApplication(), loggers);
+		locationEventHandler = new LocationEventHandler(getPtimulusApplication(), loggers);
+		telephonyEventHandler = new TelephonyEventHandler(getPtimulusApplication(), loggers);
 				
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "IcarusMission");
+		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "PtimulusMission");
 		
 		start(this);
-		getIcarusApplication().getIcarusPreferences()
+		getPtimulusApplication().getPtimulusPreferences()
 				.registerOnSharedPreferenceChangeListener(this);
 		
 		// The API for making a service run in the foreground changed between
@@ -138,7 +138,7 @@ public class PtimulusService extends Service implements
 		// This code is for API versions 5 and later to make the service
 		// ineligible for killing:
 		Notification n = updateNotification(this, true);
-		startForeground(PtimulusApplication.NOTIFY_ICARUS_ACTIVE, n);
+		startForeground(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE, n);
 
 		// This code is for API versions 4 and earlier to make the service
 		// ineligible for killing:
@@ -151,7 +151,7 @@ public class PtimulusService extends Service implements
 	public void onDestroy() {
 		super.onDestroy();
 		stop();
-		getIcarusApplication().getIcarusPreferences()
+		getPtimulusApplication().getPtimulusPreferences()
 				.unregisterOnSharedPreferenceChangeListener(this);
 		updateNotification(this, false);
 	}

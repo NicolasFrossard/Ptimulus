@@ -28,17 +28,13 @@ public class ScreenLogger implements IPtimulusLogger {
 		
 		ctx = app.getApplicationContext();
 		
-		/*destPhoneNumber = app.getIcarusPreferences().getString(
-				"targetPhoneNumber", defaultDestPhoneNumber);
-		
-		smsmanager.sendTextMessage(destPhoneNumber, null, "Hello beautiful", null, null);*/
 	}
 
-	public void logDataEvent(LogEntryType type, String data, long ts) {
+	public void logDataEvent(LogEntryType type, String data) {
 		if (!logging)
 			return;
 
-		Toast.makeText(ctx, "ScreenLog long: " + type + ": " + data, Toast.LENGTH_LONG).show();
+		Toast.makeText(ctx, type + ": " + data, Toast.LENGTH_LONG).show();
 		
 		/*
 		FileOutputStream fos;
@@ -71,7 +67,7 @@ public class ScreenLogger implements IPtimulusLogger {
 
 	public void startLogging() {
 		logging = true;
-		this.logDataEvent(LogEntryType.APP_LIFECYCLE, "Screen Logging Started", 0);
+		this.logDataEvent(LogEntryType.APP_LIFECYCLE, "Screen Logging Started");
 	}
 
 	public void stopLogging() {

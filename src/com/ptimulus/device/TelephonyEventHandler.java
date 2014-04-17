@@ -10,6 +10,7 @@ import android.telephony.TelephonyManager;
 
 import com.ptimulus.PtimulusActivity;
 import com.ptimulus.log.IPtimulusLogger;
+import com.ptimulus.log.LogEntryType;
 
 public class TelephonyEventHandler {
 
@@ -33,7 +34,6 @@ public class TelephonyEventHandler {
 	public static void registerActivity(PtimulusActivity activity) {
 		ptimulusActivity = activity;
 	}
-	
 
 	private class TelephonyStateListener extends PhoneStateListener {
 		private TelephonyEventHandler ds;
@@ -44,9 +44,12 @@ public class TelephonyEventHandler {
 		@Override
 		public void onServiceStateChanged(ServiceState serviceState) {
 			
+			for (IPtimulusLogger listener : loggers)
+				listener.logDataEvent(LogEntryType.PHONE_STATE, serviceState.toString());
+						
 			if(ptimulusActivity != null) {
 				Date d = new Date();
-				ptimulusActivity.updatePhoneState(serviceState.toString(), d.getTime());
+				ptimulusActivity.updatePhoneState(serviceState.toString());
 			}
 		}
 	}

@@ -2,19 +2,19 @@ package com.ptimulus;
 
 import java.util.HashMap;
 
-import com.ptimulus.device.LocationEventHandler;
-import com.ptimulus.device.TelephonyEventHandler;
-import com.ptimulus.log.IPtimulusLogger;
-import com.ptimulus.log.LogEntryType;
-
 import android.app.Activity;
-import android.app.LocalActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.ptimulus.device.LocationEventHandler;
+import com.ptimulus.device.TelephonyEventHandler;
+import com.ptimulus.utils.DateFactory;
 
 public class PtimulusActivity extends Activity {
 
@@ -23,18 +23,17 @@ public class PtimulusActivity extends Activity {
 	
 	private LinearLayout ll;
 	private int index;
-	private HashMap<String, TextView> dataViews;
 
 	private boolean logging;
 	
-	public void updateLocation(String newLocation, long timestamp) {
+	public void updateLocation(String newLocation) {
 		if(!logging) return;		
-		gpsTextView.setText("Last GPS received at " + timestamp + ": " + newLocation);		
+		gpsTextView.setText("Last GPS received at " + DateFactory.nowAsString() + ": " + newLocation);		
 	}
 
-	public void updatePhoneState(String newState, long timestamp) {
+	public void updatePhoneState(String newState) {
 		if(!logging) return;		
-		phoneStateTextView.setText("State received at " + timestamp + ": " + newState);
+		phoneStateTextView.setText("State received at " + DateFactory.nowAsString() + ": " + newState);
 	}
 	
 	/*
@@ -55,7 +54,7 @@ public class PtimulusActivity extends Activity {
 		t.setText(type + " " + data);
 	}*/
 
-	public PtimulusApplication getIcarusApplication() {
+	public PtimulusApplication getPtimulusApplication() {
 		return (PtimulusApplication) getApplicationContext();
 	}
 
@@ -74,17 +73,20 @@ public class PtimulusActivity extends Activity {
 		gpsTextView.setText("No GPS fix received yet");
 		ll.addView(gpsTextView, index++);
 		
+		View ruler = new View(this); 
+		ruler.setBackgroundColor(0xFFFFFFFF);
+		
+		ll.addView(ruler, new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+		index++;
+		
 		phoneStateTextView = new TextView(this);
 		phoneStateTextView.setText("No phone state received yet");
 		ll.addView(phoneStateTextView, index++);
 
 		setContentView(ll);
-
-		dataViews = new HashMap<String, TextView>();
 		
 		LocationEventHandler.registerActivity(this);
 		TelephonyEventHandler.registerActivity(this);
-
 	}
 
 	@Override

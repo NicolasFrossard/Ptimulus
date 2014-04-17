@@ -47,13 +47,12 @@ public class LocationEventHandler implements LocationListener {
 	public void onLocationChanged(Location l) {
 		
 		String text = l.getLatitude() + "," + l.getLongitude() + " " + l.getAltitude();
-		long ts = l.getTime();
 		
 		for (IPtimulusLogger listener : loggers)
-			listener.logDataEvent(LogEntryType.GPS, text, ts);
+			listener.logDataEvent(LogEntryType.GPS, text);
 		
 		if(ptimulusActivity != null) {
-			ptimulusActivity.updateLocation(text, ts);
+			ptimulusActivity.updateLocation(text);
 		}
 	}
 
