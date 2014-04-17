@@ -1,7 +1,5 @@
 package com.ptimulus;
 
-import java.util.HashMap;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +18,7 @@ public class PtimulusActivity extends Activity {
 
 	private TextView gpsTextView;
 	private TextView phoneStateTextView;
+	private TextView sensorStateTextView;
 	
 	private LinearLayout ll;
 	private int index;
@@ -35,25 +34,12 @@ public class PtimulusActivity extends Activity {
 		if(!logging) return;		
 		phoneStateTextView.setText("State received at " + DateFactory.nowAsString() + ": " + newState);
 	}
-	
-	/*
-	public void logDataEvent(LogEntryType type, String data, long timestamp) {
-		
-		if(!logging) return;
-		
-		if (timestamp > 0)
-			tv.setText("GPS Timestamp: " + timestamp + " Cell service: ");
-					+ (hasService ? "yes" : "no"));
-		TextView t;
-		if (!dataViews.containsKey(type.toString())) {
-			t = new TextView(this);
-			ll.addView(t, index++);
-			dataViews.put(type.toString(), t);
-		} else
-			t = dataViews.get(type.toString());
-		t.setText(type + " " + data);
-	}*/
 
+	public void updateSensorState(String newSensorState) {
+		if(!logging) return;		
+		phoneStateTextView.setText("Sensor state received at " + DateFactory.nowAsString() + ": " + newSensorState);
+	}
+	
 	public PtimulusApplication getPtimulusApplication() {
 		return (PtimulusApplication) getApplicationContext();
 	}
@@ -76,6 +62,9 @@ public class PtimulusActivity extends Activity {
 		View ruler = new View(this); 
 		ruler.setBackgroundColor(0xFFFFFFFF);
 		
+		View ruler2 = new View(this); 
+		ruler2.setBackgroundColor(0xFFFFFFFF);
+		
 		ll.addView(ruler, new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 		index++;
 		
@@ -83,6 +72,13 @@ public class PtimulusActivity extends Activity {
 		phoneStateTextView.setText("No phone state received yet");
 		ll.addView(phoneStateTextView, index++);
 
+		ll.addView(ruler2, new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+		index++;
+		
+		sensorStateTextView = new TextView(this);
+		sensorStateTextView.setText("No sensor state received yet");
+		ll.addView(sensorStateTextView, index++);
+		
 		setContentView(ll);
 		
 		LocationEventHandler.registerActivity(this);

@@ -16,15 +16,13 @@ public class TelephonyEventHandler {
 
 	private static PtimulusActivity ptimulusActivity;
 
-	List<IPtimulusLogger> loggers;
+	private final List<IPtimulusLogger> loggers;
 	
 	private TelephonyManager telephonyManager;
 	
 	public TelephonyEventHandler(Context ctx, List<IPtimulusLogger> loggers) {
 		this.loggers = loggers;
 
-		// set up service state listener
-		//gsmState = -1;
 		telephonyManager = (TelephonyManager) ctx
 				.getSystemService(Context.TELEPHONY_SERVICE);
 		telephonyManager.listen(new TelephonyStateListener(this),

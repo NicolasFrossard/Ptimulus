@@ -4,6 +4,11 @@ import java.util.Date;
 
 import android.text.format.DateFormat;
 
+/**
+ * 
+ * @author nicolas
+ *
+ */
 public abstract class DateFactory {
 
 	public static String format(long time) {
