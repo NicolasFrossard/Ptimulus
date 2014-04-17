@@ -38,8 +38,6 @@ public class LocationEventHandler implements LocationListener {
 		c.setAltitudeRequired(true);
 		c.setSpeedRequired(true);
 		locationProvider = gps.getBestProvider(c, true);
-
-		Toast.makeText(ctx, "LocationEventHandler just created", Toast.LENGTH_LONG).show();
 	}
 
 	public void start() {

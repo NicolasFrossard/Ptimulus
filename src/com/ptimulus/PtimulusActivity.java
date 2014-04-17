@@ -3,6 +3,7 @@ package com.ptimulus;
 import java.util.HashMap;
 
 import com.ptimulus.device.LocationEventHandler;
+import com.ptimulus.device.TelephonyEventHandler;
 import com.ptimulus.log.IPtimulusLogger;
 import com.ptimulus.log.LogEntryType;
 
@@ -17,7 +18,9 @@ import android.widget.TextView;
 
 public class PtimulusActivity extends Activity {
 
-	private TextView tv;
+	private TextView gpsTextView;
+	private TextView phoneStateTextView;
+	
 	private LinearLayout ll;
 	private int index;
 	private HashMap<String, TextView> dataViews;
@@ -25,10 +28,13 @@ public class PtimulusActivity extends Activity {
 	private boolean logging;
 	
 	public void updateLocation(String newLocation, long timestamp) {
-		if(!logging) return;
-		
-		tv.setText("Last GPS received at " + timestamp + ": " + newLocation);
-		
+		if(!logging) return;		
+		gpsTextView.setText("Last GPS received at " + timestamp + ": " + newLocation);		
+	}
+
+	public void updatePhoneState(String newState, long timestamp) {
+		if(!logging) return;		
+		phoneStateTextView.setText("State received at " + timestamp + ": " + newState);
 	}
 	
 	/*
@@ -64,15 +70,20 @@ public class PtimulusActivity extends Activity {
 		ll = new LinearLayout(this);
 		ll.setOrientation(LinearLayout.VERTICAL);
 
-		tv = new TextView(this);
-		tv.setText("No GPS fix received yet");
-		ll.addView(tv, index++);
+		gpsTextView = new TextView(this);
+		gpsTextView.setText("No GPS fix received yet");
+		ll.addView(gpsTextView, index++);
+		
+		phoneStateTextView = new TextView(this);
+		phoneStateTextView.setText("No phone state received yet");
+		ll.addView(phoneStateTextView, index++);
 
 		setContentView(ll);
 
 		dataViews = new HashMap<String, TextView>();
 		
 		LocationEventHandler.registerActivity(this);
+		TelephonyEventHandler.registerActivity(this);
 
 	}
 

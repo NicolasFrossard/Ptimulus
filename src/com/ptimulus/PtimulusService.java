@@ -16,6 +16,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 
 import com.ptimulus.device.LocationEventHandler;
+import com.ptimulus.device.TelephonyEventHandler;
 import com.ptimulus.log.FileLogger;
 import com.ptimulus.log.IPtimulusLogger;
 import com.ptimulus.log.ScreenLogger;
@@ -28,6 +29,7 @@ public class PtimulusService extends Service implements
 	private PowerManager.WakeLock wl;
 	
 	private LocationEventHandler locationEventHandler;
+	private TelephonyEventHandler telephonyEventHandler;
 	
 	public static void activateIfNecessary(Context ctx) {
 		if (isEnabled(ctx)) {
@@ -120,6 +122,7 @@ public class PtimulusService extends Service implements
 		loggers.add(new ScreenLogger(getIcarusApplication()));
 
 		locationEventHandler = new LocationEventHandler(getIcarusApplication(), loggers);
+		telephonyEventHandler = new TelephonyEventHandler(getIcarusApplication(), loggers);
 				
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "IcarusMission");
