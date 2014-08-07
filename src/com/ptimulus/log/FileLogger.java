@@ -33,8 +33,7 @@ public class FileLogger implements IPtimulusLogger {
         String filename = String.format(logfileName, DateFactory.nowForFilename());
 
 		try {
-			//File f = new File(Environment.getExternalStorageDirectory().getPath(), filename);
-            File f = new File("/sdcard", logfileName);
+			File f = new File(Environment.getExternalStorageDirectory().getPath(), filename);
 
             file = new PrintWriter(new FileOutputStream(f, true));
 			
