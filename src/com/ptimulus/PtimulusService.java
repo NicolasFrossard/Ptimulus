@@ -15,8 +15,8 @@ import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.PowerManager;
 
-import com.ptimulus.device.LocationEventHandler;
-import com.ptimulus.device.TelephonyEventHandler;
+import com.ptimulus.event.LocationEventHandler;
+import com.ptimulus.event.TelephonyEventHandler;
 import com.ptimulus.log.FileLogger;
 import com.ptimulus.log.IPtimulusLogger;
 import com.ptimulus.log.ScreenLogger;
@@ -30,7 +30,7 @@ public class PtimulusService extends Service implements
 	
 	private LocationEventHandler locationEventHandler;
 	private TelephonyEventHandler telephonyEventHandler;
-	
+
 	public static void activateIfNecessary(Context ctx) {
 		if (isEnabled(ctx)) {
 			Intent startIntent = new Intent(ctx, PtimulusService.class);
@@ -69,8 +69,7 @@ public class PtimulusService extends Service implements
 
 			PendingIntent pi = PendingIntent.getActivity(ctx, 0, ni, 0);
 			n.setLatestEventInfo(ctx, "Ptimulus", "Ptimulus is active", pi);
-			notificationManager.notify(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE,
-					n);
+			notificationManager.notify(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE, n);
 
 			return n;
 		} else {
@@ -130,21 +129,9 @@ public class PtimulusService extends Service implements
 		start(this);
 		getPtimulusApplication().getPtimulusPreferences()
 				.registerOnSharedPreferenceChangeListener(this);
-		
-		// The API for making a service run in the foreground changed between
-		// API versions 4 and 5. For it to be effective, we must use the call
-		// corresponding to the API version of the device that we're running on.
 
-		// This code is for API versions 5 and later to make the service
-		// ineligible for killing:
 		Notification n = updateNotification(this, true);
 		startForeground(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE, n);
-
-		// This code is for API versions 4 and earlier to make the service
-		// ineligible for killing:
-		
-		//updateNotification(this, true);
-		//setForeground(true);
 	}
 
 	@Override
@@ -160,6 +147,5 @@ public class PtimulusService extends Service implements
 			String key) {
 		if (!isEnabled(this))
 			stopSelf();
-
 	}
 }

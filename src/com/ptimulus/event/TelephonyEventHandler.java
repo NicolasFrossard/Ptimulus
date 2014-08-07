@@ -1,6 +1,5 @@
-package com.ptimulus.device;
+package com.ptimulus.event;
 
-import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
@@ -17,16 +16,12 @@ public class TelephonyEventHandler {
 	private static PtimulusActivity ptimulusActivity;
 
 	private final List<IPtimulusLogger> loggers;
-	
-	private TelephonyManager telephonyManager;
-	
-	public TelephonyEventHandler(Context ctx, List<IPtimulusLogger> loggers) {
+
+    public TelephonyEventHandler(Context ctx, List<IPtimulusLogger> loggers) {
 		this.loggers = loggers;
 
-		telephonyManager = (TelephonyManager) ctx
-				.getSystemService(Context.TELEPHONY_SERVICE);
-		telephonyManager.listen(new TelephonyStateListener(this),
-				PhoneStateListener.LISTEN_SERVICE_STATE);
+        TelephonyManager telephonyManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+		telephonyManager.listen(new TelephonyStateListener(), PhoneStateListener.LISTEN_SERVICE_STATE);
 	}
 	
 	public static void registerActivity(PtimulusActivity activity) {
@@ -34,11 +29,10 @@ public class TelephonyEventHandler {
 	}
 
 	private class TelephonyStateListener extends PhoneStateListener {
-		private TelephonyEventHandler ds;
 
-		public TelephonyStateListener(TelephonyEventHandler ds) {
-			this.ds = ds;
+		public TelephonyStateListener() {
 		}
+
 		@Override
 		public void onServiceStateChanged(ServiceState serviceState) {
 			
@@ -46,7 +40,6 @@ public class TelephonyEventHandler {
 				listener.logDataEvent(LogEntryType.PHONE_STATE, serviceState.toString());
 						
 			if(ptimulusActivity != null) {
-				Date d = new Date();
 				ptimulusActivity.updatePhoneState(serviceState.toString());
 			}
 		}

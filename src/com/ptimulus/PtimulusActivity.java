@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.ptimulus.device.LocationEventHandler;
-import com.ptimulus.device.TelephonyEventHandler;
+import com.ptimulus.event.LocationEventHandler;
+import com.ptimulus.event.TelephonyEventHandler;
 import com.ptimulus.utils.DateFactory;
 
 public class PtimulusActivity extends Activity {
@@ -26,20 +26,25 @@ public class PtimulusActivity extends Activity {
 	private boolean logging;
 	
 	public void updateLocation(String newLocation) {
-		if(!logging) return;		
+		if(!logging)
+			return;
+		
 		gpsTextView.setText("Last GPS received at " + DateFactory.nowAsString() + ": " + newLocation);		
 	}
 
 	public void updatePhoneState(String newState) {
-		if(!logging) return;		
+		if(!logging)
+			return;
+		
 		phoneStateTextView.setText("State received at " + DateFactory.nowAsString() + ": " + newState);
 	}
 
 	public void updateSensorState(String newSensorState) {
-		if(!logging) return;		
-		phoneStateTextView.setText("Sensor state received at " + DateFactory.nowAsString() + ": " + newSensorState);
-	}
-	
+        phoneStateTextView.setText("Sensor state received at " + DateFactory.nowAsString() + ": " + newSensorState);
+        if (!logging)
+            return;
+    }
+		
 	public PtimulusApplication getPtimulusApplication() {
 		return (PtimulusApplication) getApplicationContext();
 	}
@@ -47,9 +52,6 @@ public class PtimulusActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// camera = Camera.open();
-		// camera.setPreviewCallback(this);
 
 		index = 0;
 		ll = new LinearLayout(this);

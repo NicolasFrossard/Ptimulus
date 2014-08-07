@@ -14,6 +14,10 @@ public abstract class DateFactory {
 	public static String format(long time) {
 		return DateFormat.format("yyyy-MM-dd hh:mm:ss", time).toString();
 	}
+
+    public static String nowForFilename() {
+        return DateFormat.format("yyyy-MM-dd_hh-mm", new Date().getTime()).toString();
+    }
 	
 	public static String nowAsString() {
 		return format(nowAsLong());	

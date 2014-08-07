@@ -1,6 +1,5 @@
 package com.ptimulus;
 
-import com.ptimulus.R;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 

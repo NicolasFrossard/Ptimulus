@@ -1,4 +1,4 @@
-package com.ptimulus.device;
+package com.ptimulus.event;
 
 import java.util.List;
 
@@ -8,7 +8,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.ptimulus.PtimulusActivity;
 import com.ptimulus.log.IPtimulusLogger;

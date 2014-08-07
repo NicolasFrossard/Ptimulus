@@ -4,11 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 
+import android.os.Environment;
 import com.ptimulus.utils.DateFactory;
 
 public class FileLogger implements IPtimulusLogger {
 
-	final String logfileName = "ptimulus.log";
+	private final String logfileName = "ptimulus%s.log";
 	private PrintWriter file;
 	
 	private boolean logging;
@@ -23,13 +24,19 @@ public class FileLogger implements IPtimulusLogger {
 		
 		file.println(DateFactory.nowAsString() + " | " + type + ": " + data	+ " ");
 		file.flush();
-
 	}
 
 	public void startLogging() {
+        if(logging)
+            return;
+
+        String filename = String.format(logfileName, DateFactory.nowForFilename());
+
 		try {
-			File f = new File("/sdcard", logfileName);
-			file = new PrintWriter(new FileOutputStream(f, true));
+			//File f = new File(Environment.getExternalStorageDirectory().getPath(), filename);
+            File f = new File("/sdcard", logfileName);
+
+            file = new PrintWriter(new FileOutputStream(f, true));
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -39,8 +46,9 @@ public class FileLogger implements IPtimulusLogger {
 	}
 
 	public void stopLogging() {
-		if (logging)
+		if (!logging)
 			return;
+
 		file.close();
 		logging = false;
 	}

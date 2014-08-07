@@ -1,4 +1,4 @@
-package com.ptimulus.device;
+package com.ptimulus.event;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -20,31 +20,29 @@ public class SensorEventHandler {
 	private final List<IPtimulusLogger> loggers;
 
 	private SensorManager sensors;
-	private List<SensorEventAdapter> adapterlist;
+	private List<SensorEventAdapter> adapterList;
 	
 	public SensorEventHandler(Context ctx, List<IPtimulusLogger> loggers) {
 		this.loggers = loggers;
 		
 		// set up sensor listener
 		sensors = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
-		adapterlist = new LinkedList<SensorEventAdapter>();
+		adapterList = new LinkedList<SensorEventAdapter>();
 		for (Sensor s : sensors.getSensorList(Sensor.TYPE_ALL))
-			adapterlist.add(new SensorEventAdapter(s));
-
+			adapterList.add(new SensorEventAdapter(s));
 	}
-	
+
 	public static void registerActivity(PtimulusActivity activity) {
 		ptimulusActivity = activity;
 	}
-	
+
 	public void start() {
-		for (SensorEventAdapter s : adapterlist) 
+		for (SensorEventAdapter s : adapterList)
 			s.startSensor();
 	}
 
-
 	public void stop() {
-		for (SensorEventAdapter s : adapterlist)
+		for (SensorEventAdapter s : adapterList)
 			s.stopSensor();
 	}
 	
@@ -59,15 +57,18 @@ public class SensorEventHandler {
 		}
 
 		public void onSensorChanged(SensorEvent event) {
-			String sdata = "";
-			for (float f : event.values)
-				sdata += " " + f;
+            StringBuilder data = new StringBuilder();
+
+			for (float f : event.values) {
+                data.append(" ");
+                data.append(f);
+            }
 
 			for (IPtimulusLogger listener : loggers)
-				listener.logDataEvent(LogEntryType.SENSOR, sdata);
+				listener.logDataEvent(LogEntryType.SENSOR, data.toString());
 			
 			if(ptimulusActivity != null) {
-				ptimulusActivity.updateSensorState(sdata);
+				ptimulusActivity.updateSensorState(data.toString());
 			}
 		}
 
