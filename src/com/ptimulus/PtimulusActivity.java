@@ -19,11 +19,8 @@ public class PtimulusActivity extends Activity {
 	private TextView gpsTextView;
 	private TextView phoneStateTextView;
 	private TextView sensorStateTextView;
-	
-	private LinearLayout ll;
-	private int index;
 
-	private boolean logging;
+    private boolean logging;
 	
 	public void updateLocation(String newLocation) {
 		if(!logging)
@@ -40,21 +37,18 @@ public class PtimulusActivity extends Activity {
 	}
 
 	public void updateSensorState(String newSensorState) {
-        phoneStateTextView.setText("Sensor state received at " + DateFactory.nowAsString() + ": " + newSensorState);
         if (!logging)
             return;
+
+        phoneStateTextView.setText("Sensor state received at " + DateFactory.nowAsString() + ": " + newSensorState);
     }
-		
-	public PtimulusApplication getPtimulusApplication() {
-		return (PtimulusApplication) getApplicationContext();
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		index = 0;
-		ll = new LinearLayout(this);
+        int index = 0;
+        LinearLayout ll = new LinearLayout(this);
 		ll.setOrientation(LinearLayout.VERTICAL);
 
 		gpsTextView = new TextView(this);
@@ -67,14 +61,14 @@ public class PtimulusActivity extends Activity {
 		View ruler2 = new View(this); 
 		ruler2.setBackgroundColor(0xFFFFFFFF);
 		
-		ll.addView(ruler, new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+		ll.addView(ruler, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 2));
 		index++;
 		
 		phoneStateTextView = new TextView(this);
 		phoneStateTextView.setText("No phone state received yet");
 		ll.addView(phoneStateTextView, index++);
 
-		ll.addView(ruler2, new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+		ll.addView(ruler2, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 2));
 		index++;
 		
 		sensorStateTextView = new TextView(this);

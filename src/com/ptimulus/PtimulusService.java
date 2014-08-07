@@ -22,6 +22,78 @@ import com.ptimulus.log.IPtimulusLogger;
 import com.ptimulus.log.ScreenLogger;
 import com.ptimulus.log.SmsLogger;
 
+/*
+@startuml
+
+PreFlight : Waiting for launch
+TakeOff : Video for 2 min
+Ascent : Picture each 30 seconds, Video each 10 min for 20sec
+DescentStart : Video for 2 min
+Descent : Picture each 1 min, Video each 2 min, send coords as soon as possible x 3
+Upload : send coords as soon as possible x 3, then upload data
+
+[*] --> PreFlight
+PreFlight --> TakeOff : User input
+TakeOff --> Ascent : 2 min
+Ascent --> DescentStart : Detection with GPS/accel
+DescentStart --> Descent : 2 min
+Descent --> Upload
+
+@enduml
+
+
+                                 ,------.
+                                 |*start|
+                                 |------|
+                                 |------|
+                                 `------'
+                                     |
+                                     |
+                           ,------------------.
+                           |PreFlight         |
+                           |------------------|
+                           |Waiting for launch|
+                           |------------------|
+                           `------------------'
+                                     |
+                            ,---------------.
+                            |TakeOff        |
+                            |---------------|
+                            |Video for 2 min|
+                            |---------------|
+                            `---------------'
+                                     |
+
+          ,----------------------------------------------------.
+          |Ascent                                              |
+          |----------------------------------------------------|
+          |Picture each 30 seconds, Video each 10 min for 20sec|
+          |----------------------------------------------------|
+          `----------------------------------------------------'
+                                     |
+                            ,---------------.
+                            |DescentStart   |
+                            |---------------|
+                            |Video for 2 min|
+                            |---------------|
+                            `---------------'
+                                     |
+,-------------------------------------------------------------------------.
+|Descent                                                                  |
+|-------------------------------------------------------------------------|
+|Picture each 1 min, Video each 2 min, send coords as soon as possible x 3|
+|-------------------------------------------------------------------------|
+`-------------------------------------------------------------------------'
+                                     |
+                                     |
+         ,-----------------------------------------------------.
+         |Upload                                               |
+         |-----------------------------------------------------|
+         |send coords as soon as possible x 3, then upload data|
+         |-----------------------------------------------------|
+         `-----------------------------------------------------'
+ */
+
 public class PtimulusService extends Service implements
 		OnSharedPreferenceChangeListener {
 
