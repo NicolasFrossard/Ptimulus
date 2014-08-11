@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -19,14 +20,15 @@ public class PtimulusActivity extends Activity {
 	private TextView gpsTextView;
 	private TextView phoneStateTextView;
 	private TextView sensorStateTextView;
+	private int index;
 
-    private boolean logging;
+	private boolean logging;
 	
 	public void updateLocation(String newLocation) {
 		if(!logging)
 			return;
 		
-		gpsTextView.setText("Last GPS received at " + DateFactory.nowAsString() + ": " + newLocation);		
+		gpsTextView.setText("2 Last GPS received at " + DateFactory.nowAsString() + ": " + newLocation);		
 	}
 
 	public void updatePhoneState(String newState) {
@@ -50,7 +52,8 @@ public class PtimulusActivity extends Activity {
         int index = 0;
         LinearLayout ll = new LinearLayout(this);
 		ll.setOrientation(LinearLayout.VERTICAL);
-
+       
+        
 		gpsTextView = new TextView(this);
 		gpsTextView.setText("No GPS fix received yet");
 		ll.addView(gpsTextView, index++);
@@ -75,6 +78,15 @@ public class PtimulusActivity extends Activity {
 		sensorStateTextView.setText("No sensor state received yet");
 		ll.addView(sensorStateTextView, index++);
 		
+		final Button button = new Button(this);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+        		PtimulusCamera.takePicture();
+            }
+        });
+        button.setText("Take picture");
+        ll.addView(button, index++);
+        
 		setContentView(ll);
 		
 		LocationEventHandler.registerActivity(this);
