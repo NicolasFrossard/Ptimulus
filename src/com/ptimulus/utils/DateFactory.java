@@ -19,6 +19,10 @@ public abstract class DateFactory {
         return DateFormat.format("yyyy-MM-dd_hh-mm", new Date().getTime()).toString();
     }
 	
+    public static String nowForPhotoFilename() {
+        return DateFormat.format("yyyy-MM-dd_hh-mm-ss", new Date().getTime()).toString();
+    }
+    
 	public static String nowAsString() {
 		return format(nowAsLong());	
 	}

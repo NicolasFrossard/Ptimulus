@@ -52,7 +52,6 @@ public class PtimulusActivity extends Activity {
         int index = 0;
         LinearLayout ll = new LinearLayout(this);
 		ll.setOrientation(LinearLayout.VERTICAL);
-       
         
 		gpsTextView = new TextView(this);
 		gpsTextView.setText("No GPS fix received yet");
@@ -81,10 +80,10 @@ public class PtimulusActivity extends Activity {
 		final Button button = new Button(this);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-        		PtimulusCamera.takePicture();
+        		PtimulusCamera.takePicture(getApplicationContext());
             }
         });
-        button.setText("Take picture");
+        button.setText("Let's take a little picture");
         ll.addView(button, index++);
         
 		setContentView(ll);
