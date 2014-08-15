@@ -11,18 +11,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.location.Location;
 import android.media.MediaPlayer;
+import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 
-import com.ptimulus.event.LocationEventHandler;
-import com.ptimulus.event.TelephonyEventHandler;
-import com.ptimulus.log.FileLogger;
-import com.ptimulus.log.IPtimulusLogger;
-import com.ptimulus.log.ScreenLogger;
-import com.ptimulus.log.SmsLogger;
+import android.telephony.ServiceState;
+import android.util.Log;
+import com.ptimulus.event.LocationEvent;
+import com.ptimulus.event.SensorEvent;
+import com.ptimulus.event.TelephonyEvent;
+import com.ptimulus.event.TimerEvent;
+import com.ptimulus.log.*;
 
 /*
+Done using PlantUML: http://plantuml.sourceforge.net/
+Live edit and Ascii graph: http://www.plantuml.com/plantuml/
+
 @startuml
 
 PreFlight : Waiting for launch
@@ -94,41 +100,123 @@ Descent --> Upload
          `-----------------------------------------------------'
  */
 
-public class PtimulusService extends Service implements
-		OnSharedPreferenceChangeListener {
+public class PtimulusService extends Service implements OnSharedPreferenceChangeListener {
 
+    public final String DEFAULT_DEST_NUMBER = "2096270247";
+
+    private boolean active;
 	private PowerManager pm;
 	private PowerManager.WakeLock wl;
-	
-	private LocationEventHandler locationEventHandler;
-	private TelephonyEventHandler telephonyEventHandler;
 
-	public static void activateIfNecessary(Context ctx) {
-		if (isEnabled(ctx)) {
-			Intent startIntent = new Intent(ctx, PtimulusService.class);
-			ctx.startService(startIntent);
-		}
-	}
-	
+    private TimerEvent timerEvent;
+	private LocationEvent locationEvent;
+    private SensorEvent sensorEvent;
+	private TelephonyEvent telephonyEvent;
+
 	private final List<IPtimulusLogger> loggers = new ArrayList<IPtimulusLogger>();
 
-	boolean active;
+    private final IBinder binder = new PtimulusServiceBinder();
+    private PtimulusActivity activity;
 
 	public PtimulusService() {
 		super();
 		active = false;
 	}
 
-	PtimulusApplication getPtimulusApplication() {
-		return (PtimulusApplication) getApplicationContext();
-	}
+    public void start(Context ctx) {
+        if (active)
+            return;
 
-	static boolean isEnabled(Context ctx) {
+        timerEvent.startListening();
+        sensorEvent.startListening();
+        locationEvent.startListening();
+        telephonyEvent.startListening();
+
+        for(IPtimulusLogger logger : loggers) {
+            logger.startLogging();
+        }
+
+        wl.acquire();
+        active = true;
+
+        // Play a audio file to mark the start
+        MediaPlayer.create(ctx, R.raw.ready).start();
+    }
+
+    public void stop() {
+        if (!active)
+            return;
+
+        timerEvent.stopListening();
+        sensorEvent.stopListening();
+        locationEvent.stopListening();
+        telephonyEvent.stopListening();
+
+        for(IPtimulusLogger logger : loggers) {
+            logger.stopLogging();
+        }
+
+        wl.release();
+        active = false;
+    }
+
+    public void timerTick() {
+
+    }
+
+    public void locationEvent(Location l) {
+        String text = String.format("%s,%s %s", l.getLatitude(), l.getLongitude(), l.getAltitude());
+
+        relayLog(LogEntryType.GPS, text);
+
+        if(activity != null)
+            activity.updateLocation(text);
+    }
+
+    public void sensorEvent(android.hardware.SensorEvent event) {
+        /*StringBuilder data = new StringBuilder();
+
+        for (float f : event.values) {
+            data.append(" ");
+            data.append(f);
+        }
+
+        relayLog(LogEntryType.SENSOR, data.toString());
+
+        if(activity != null)
+            activity.updateSensorState(data.toString());*/
+    }
+
+    public void telephonyEvent(ServiceState serviceState) {
+        relayLog(LogEntryType.PHONE_STATE, serviceState.toString());
+
+        if(activity != null)
+            activity.updatePhoneState(serviceState.toString());
+    }
+
+    /**
+     * Relay log entry to all registered logger
+     * @param type
+     * @param entry
+     */
+    private void relayLog(LogEntryType type, String entry) {
+        for(IPtimulusLogger logger : loggers)
+            logger.logDataEvent(type, entry);
+    }
+
+    public static void activateIfNecessary(Context ctx) {
+        if (isEnabled(ctx)) {
+            Intent startIntent = new Intent(ctx, PtimulusService.class);
+            ctx.startService(startIntent);
+        }
+    }
+
+	private static boolean isEnabled(Context ctx) {
 		return ((PtimulusApplication) ctx.getApplicationContext())
 				.getPtimulusPreferences().getBoolean("enableLogging", false);
 	}
 
-	static Notification updateNotification(Context ctx, boolean enabled) {
+	private static Notification updateNotification(Context ctx, boolean enabled) {
 		NotificationManager notificationManager = (NotificationManager) ctx
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -150,57 +238,42 @@ public class PtimulusService extends Service implements
 		}
 	}
 
-	public void start(Context ctx) {
-		if (active)
-			return;
-		locationEventHandler.start();
-		
-		for(IPtimulusLogger logger : loggers) {
-			logger.startLogging();	
-		}
-		
-		wl.acquire();
-		active = true;
+    public class PtimulusServiceBinder extends Binder {
 
-		MediaPlayer mp = MediaPlayer.create(ctx, R.raw.ready);
-		mp.start();
-	}
+        public PtimulusService getService() {
+            return PtimulusService.this;
+        }
 
-	public void stop() {
-		if (!active)
-			return;
-		locationEventHandler.stop();
-
-		for(IPtimulusLogger logger : loggers) {
-			logger.stopLogging();	
-		}
-		
-		wl.release();
-		active = false;
-	}
+        public void registerActivity(PtimulusActivity activity) {
+            PtimulusService.this.activity = activity;
+        }
+    }
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		return null;
+		return binder;
 	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 
-		loggers.add(new SmsLogger(getPtimulusApplication()));
-		loggers.add(new FileLogger());
-		loggers.add(new ScreenLogger(getPtimulusApplication()));
+        Context ctx = getApplicationContext();
+        SharedPreferences preferences = ((PtimulusApplication) ctx).getPtimulusPreferences();
 
-		locationEventHandler = new LocationEventHandler(getPtimulusApplication(), loggers);
-		telephonyEventHandler = new TelephonyEventHandler(getPtimulusApplication(), loggers);
+		loggers.add(new SmsLogger(preferences.getString("targetPhoneNumber", DEFAULT_DEST_NUMBER)));
+		loggers.add(new FileLogger());
+
+        timerEvent = new TimerEvent(this);
+        sensorEvent = new SensorEvent(this, ctx);
+		locationEvent = new LocationEvent(this, ctx);
+		telephonyEvent = new TelephonyEvent(this, ctx);
 				
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "PtimulusMission");
 		
 		start(this);
-		getPtimulusApplication().getPtimulusPreferences()
-				.registerOnSharedPreferenceChangeListener(this);
+        preferences.registerOnSharedPreferenceChangeListener(this);
 
 		Notification n = updateNotification(this, true);
 		startForeground(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE, n);
@@ -210,13 +283,11 @@ public class PtimulusService extends Service implements
 	public void onDestroy() {
 		super.onDestroy();
 		stop();
-		getPtimulusApplication().getPtimulusPreferences()
-				.unregisterOnSharedPreferenceChangeListener(this);
+        ((PtimulusApplication) getApplicationContext()).getPtimulusPreferences().unregisterOnSharedPreferenceChangeListener(this);
 		updateNotification(this, false);
 	}
 
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-			String key) {
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 		if (!isEnabled(this))
 			stopSelf();
 	}

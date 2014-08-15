@@ -17,8 +17,8 @@
     
     <application
         android:name="com.ptimulus.PtimulusApplication"
-        android:debuggable="true"
         android:label="@string/app_name" >
+
         <activity
             android:name="com.ptimulus.PtimulusActivity"
             android:label="@string/app_name" >
@@ -28,15 +28,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="com.ptimulus.PtimulusPreferenceActivity"
-            android:label="Ptimulus Preferences" />
-
-        <receiver android:name="com.ptimulus.PtimulusAutoStarter" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
+            android:label="Ptimulus Preferences" >
+        </activity>
 
         <service android:name="com.ptimulus.PtimulusService" />
 

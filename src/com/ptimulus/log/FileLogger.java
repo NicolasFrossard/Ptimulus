@@ -9,7 +9,7 @@ import com.ptimulus.utils.DateFactory;
 
 public class FileLogger implements IPtimulusLogger {
 
-	private final String logfileName = "ptimulus%s.log";
+	private final String LOG_FILENAME = "ptimulus%s.log";
 	private PrintWriter file;
 	
 	private boolean logging;
@@ -18,19 +18,27 @@ public class FileLogger implements IPtimulusLogger {
 		logging = false;
 	}
 
-	public void logDataEvent(LogEntryType type, String data) {
+    /**
+     * Record a new event.
+     * @param type type of log entry
+     * @param entry text of log entry
+     */
+	public void logDataEvent(LogEntryType type, String entry) {
 		if (!logging)
 			return;
 		
-		file.println(DateFactory.nowAsString() + " | " + type + ": " + data	+ " ");
+		file.println(DateFactory.nowAsString() + " | " + type + ": " + entry	+ " ");
 		file.flush();
 	}
 
+    /**
+     * Enable the logging.
+     */
 	public void startLogging() {
         if(logging)
             return;
 
-        String filename = String.format(logfileName, DateFactory.nowForFilename());
+        String filename = String.format(LOG_FILENAME, DateFactory.nowForFilename());
 
 		try {
 			File f = new File(Environment.getExternalStorageDirectory().getPath(), filename);
@@ -44,6 +52,9 @@ public class FileLogger implements IPtimulusLogger {
 		this.logDataEvent(LogEntryType.APP_LIFECYCLE, "File logging Started");
 	}
 
+    /**
+     * Disable the logging.
+     */
 	public void stopLogging() {
 		if (!logging)
 			return;

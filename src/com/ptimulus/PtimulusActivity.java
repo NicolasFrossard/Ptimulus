@@ -1,8 +1,12 @@
 package com.ptimulus;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,37 +15,25 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.ptimulus.event.LocationEventHandler;
-import com.ptimulus.event.TelephonyEventHandler;
 import com.ptimulus.utils.DateFactory;
 
 public class PtimulusActivity extends Activity {
 
+    private PtimulusService service = null;
+
 	private TextView gpsTextView;
 	private TextView phoneStateTextView;
 	private TextView sensorStateTextView;
-	private int index;
 
-	private boolean logging;
-	
 	public void updateLocation(String newLocation) {
-		if(!logging)
-			return;
-		
-		gpsTextView.setText("2 Last GPS received at " + DateFactory.nowAsString() + ": " + newLocation);		
+        gpsTextView.setText("Last GPS received at " + DateFactory.nowAsString() + ": " + newLocation);
 	}
 
 	public void updatePhoneState(String newState) {
-		if(!logging)
-			return;
-		
 		phoneStateTextView.setText("State received at " + DateFactory.nowAsString() + ": " + newState);
 	}
 
 	public void updateSensorState(String newSensorState) {
-        if (!logging)
-            return;
-
         phoneStateTextView.setText("Sensor state received at " + DateFactory.nowAsString() + ": " + newSensorState);
     }
 
@@ -87,21 +79,27 @@ public class PtimulusActivity extends Activity {
         ll.addView(button, index++);
         
 		setContentView(ll);
-		
-		LocationEventHandler.registerActivity(this);
-		TelephonyEventHandler.registerActivity(this);
 	}
 
-	@Override
-	public void onPause() {
-		super.onPause();
-		logging = false;
-	}
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Intent intent = new Intent(this, PtimulusService.class);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        if(service != null)
+            unbindService(connection);
+    }
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		logging = true;
 		PtimulusService.activateIfNecessary(this);
 	}
 
@@ -118,4 +116,17 @@ public class PtimulusActivity extends Activity {
 		return (true);
 	}
 
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            PtimulusService.PtimulusServiceBinder binder = (PtimulusService.PtimulusServiceBinder) iBinder;
+            service = binder.getService();
+            binder.registerActivity(PtimulusActivity.this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            service = null;
+        }
+    };
 }

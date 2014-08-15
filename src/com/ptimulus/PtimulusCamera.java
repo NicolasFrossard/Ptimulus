@@ -51,7 +51,6 @@ public class PtimulusCamera {
 		});
 	}
 	
-	
 	private static File getPtimulusDir() {
 
 		File ptimulusDir = new File(PTIMULUS_DIR);
@@ -67,7 +66,6 @@ public class PtimulusCamera {
 	private static String generateFileName() {
 		return "pic_" + DateFactory.nowForPhotoFilename() + ".jpg";
 	}
-	
 
 	private static int findFrontFacingCamera() {  
 		
@@ -92,7 +90,6 @@ public class PtimulusCamera {
 	private static void releaseCamera(Camera camera) {
 	    if (camera != null) {
 	    	camera.release();
-	    	camera = null;
 	    }
 	}
 }

@@ -7,27 +7,22 @@ import com.ptimulus.utils.DateFactory;
 
 public class SmsLogger implements IPtimulusLogger {
 
-	public final String DEFAULT_DEST_NUMBER = "2096270247";
 	private final long SEND_INTERVAL = 0;
 
-    private String destPhoneNumber;
+    private final String destPhoneNumber;
+	private final SmsManager smsmanager;
 
-	private SmsManager smsmanager;
-	private long lastSent;
-	
+    private long lastSent;
 	private boolean logging;
 
+	public SmsLogger(String destPhoneNumber) {
+        this.destPhoneNumber = destPhoneNumber;
+		this.smsmanager = SmsManager.getDefault();
 
-	public SmsLogger(PtimulusApplication app) {
-		smsmanager = SmsManager.getDefault();
-
-        lastSent = 0;
-		logging = false;
-
-		destPhoneNumber = app.getPtimulusPreferences().getString(
-				"targetPhoneNumber", DEFAULT_DEST_NUMBER);
+        this.lastSent = 0;
+		this.logging = false;
 		
-		smsmanager.sendTextMessage(destPhoneNumber, null, "Hello beautiful", null, null);
+		smsmanager.sendTextMessage(destPhoneNumber, null, "Ptimulus started", null, null);
 	}
 
 	public void logDataEvent(LogEntryType type, String data) {
