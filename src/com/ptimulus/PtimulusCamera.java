@@ -9,7 +9,9 @@ import com.ptimulus.utils.DateFactory;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.CameraInfo;
+import android.hardware.Camera.Parameters;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
@@ -25,8 +27,19 @@ public class PtimulusCamera {
 		int camId = findFrontFacingCamera();
 		Camera mCamera = Camera.open(camId);
 		
+		Camera.Parameters params = mCamera.getParameters();
+        params.setWhiteBalance(Parameters.WHITE_BALANCE_AUTO);
+        params.setSceneMode(Parameters.SCENE_MODE_AUTO);
+        params.setExposureCompensation(params.getMaxExposureCompensation());
+        params.setJpegQuality(70);
+        params.setPictureSize(2048, 1536);
+        
+        mCamera.setParameters(params);
+        
+        
+        
 		mCamera.takePicture(null, null, new Camera.PictureCallback() {
-		
+			
 			public void onPictureTaken(byte[] data, Camera camera) {
 			         
 				FileOutputStream outStream = null;
