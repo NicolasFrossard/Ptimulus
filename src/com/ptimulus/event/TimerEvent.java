@@ -8,7 +8,7 @@ import java.util.TimerTask;
 /**
  * This class implement a timer that will feed the service with regular event.
  */
-public class TimerEvent implements IEvent {
+public class TimerEvent {
 
     private PtimulusService ptimulusService;
     private Timer timer;
@@ -17,17 +17,7 @@ public class TimerEvent implements IEvent {
     {
         this.ptimulusService = ptimulusService;
         this.timer = new Timer();
-    }
-
-    @Override
-    public void startListening() {
-        // Run the task each seconds
-        timer.scheduleAtFixedRate(task, 0, 1000);
-    }
-
-    @Override
-    public void stopListening() {
-        task.cancel();
+        this.timer.scheduleAtFixedRate(task, 0, 1000);
     }
 
     private TimerTask task = new TimerTask() {

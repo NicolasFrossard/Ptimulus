@@ -19,9 +19,14 @@ public class LocationEvent implements LocationListener, IEvent {
     private final PtimulusService ptimulusService;
 	private final LocationManager gps;
 	private final String locationProvider;
+
+    private Location lastLocation;
+    private long lastLocationTime;
 	
 	public LocationEvent(PtimulusService ptimulusService, Context ctx) {
         this.ptimulusService = ptimulusService;
+        this.lastLocation = null;
+        this.lastLocationTime = 0;
 
 		// set up gps
 		gps = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
@@ -45,8 +50,40 @@ public class LocationEvent implements LocationListener, IEvent {
         gps.removeUpdates(this);
     }
 
-	public void onLocationChanged(Location l) {
-		ptimulusService.locationEvent(l);
+    /**
+     * Timer tick from the service. Assumed to be 1Hz.
+     */
+    @Override
+    public void tick() {
+        if(lastLocation != null)
+            ptimulusService.locationEvent(lastLocation);
+    }
+
+    /**
+     * Age of the last measure, in milliseconds.
+     *
+     * @return
+     */
+    @Override
+    public long dataAge() {
+        return System.currentTimeMillis() - lastLocationTime;
+    }
+
+    @Override
+    public String toString() {
+        if(lastLocation == null)
+            return "No GPS event yet";
+
+        return String.format("%d sec | %s|%s  alt %s",
+        		Math.round(dataAge() / 1000f),
+        		Location.convert(lastLocation.getLatitude(), Location.FORMAT_MINUTES),
+        		Location.convert(lastLocation.getLongitude(), Location.FORMAT_MINUTES),
+        		lastLocation.getAltitude());
+    }
+
+    public void onLocationChanged(Location l) {
+        lastLocation = l;
+        lastLocationTime = System.currentTimeMillis();
 	}
 
     @Override

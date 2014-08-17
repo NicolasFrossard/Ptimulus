@@ -18,11 +18,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 
 import android.telephony.ServiceState;
-import android.util.Log;
-import com.ptimulus.event.LocationEvent;
-import com.ptimulus.event.SensorEvent;
-import com.ptimulus.event.TelephonyEvent;
-import com.ptimulus.event.TimerEvent;
+import com.ptimulus.event.*;
 import com.ptimulus.log.*;
 
 /*
@@ -108,12 +104,13 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 	private PowerManager pm;
 	private PowerManager.WakeLock wl;
 
+    private final List<IPtimulusLogger> loggers = new ArrayList<IPtimulusLogger>();
+    private ScreenLogger screenLogger;
+
     private TimerEvent timerEvent;
 	private LocationEvent locationEvent;
-    private SensorEvent sensorEvent;
+    private AccelerometerEvent accelerometerEvent;
 	private TelephonyEvent telephonyEvent;
-
-	private final List<IPtimulusLogger> loggers = new ArrayList<IPtimulusLogger>();
 
     private final IBinder binder = new PtimulusServiceBinder();
     private PtimulusActivity activity;
@@ -127,8 +124,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         if (active)
             return;
 
-        timerEvent.startListening();
-        sensorEvent.startListening();
+        accelerometerEvent.startListening();
         locationEvent.startListening();
         telephonyEvent.startListening();
 
@@ -147,8 +143,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         if (!active)
             return;
 
-        timerEvent.stopListening();
-        sensorEvent.stopListening();
+        accelerometerEvent.stopListening();
         locationEvent.stopListening();
         telephonyEvent.stopListening();
 
@@ -162,19 +157,19 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 
     public void timerTick() {
 
+        locationEvent.tick();
+        telephonyEvent.tick();
+        accelerometerEvent.tick();
     }
 
     public void locationEvent(Location l) {
         String text = String.format("%s,%s %s", l.getLatitude(), l.getLongitude(), l.getAltitude());
 
         relayLog(LogEntryType.GPS, text);
-
-        if(activity != null)
-            activity.updateLocation(text);
     }
 
     public void sensorEvent(android.hardware.SensorEvent event) {
-        /*StringBuilder data = new StringBuilder();
+        StringBuilder data = new StringBuilder();
 
         for (float f : event.values) {
             data.append(" ");
@@ -182,16 +177,10 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         }
 
         relayLog(LogEntryType.SENSOR, data.toString());
-
-        if(activity != null)
-            activity.updateSensorState(data.toString());*/
     }
 
     public void telephonyEvent(ServiceState serviceState) {
         relayLog(LogEntryType.PHONE_STATE, serviceState.toString());
-
-        if(activity != null)
-            activity.updatePhoneState(serviceState.toString());
     }
 
     /**
@@ -203,6 +192,22 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         for(IPtimulusLogger logger : loggers)
             logger.logDataEvent(type, entry);
     }
+
+    public String locationUIdata() {
+        return locationEvent.toString();
+    }
+
+    public String accelerometerUIdata() {
+        return accelerometerEvent.toString();
+    }
+
+    public String telephonyUIdata() {
+        return telephonyEvent.toString();
+    }
+    
+	public CharSequence logUIData() {
+		return screenLogger.toString();
+	}
 
     public static void activateIfNecessary(Context ctx) {
         if (isEnabled(ctx)) {
@@ -263,11 +268,13 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 
 		loggers.add(new SmsLogger(preferences.getString("targetPhoneNumber", DEFAULT_DEST_NUMBER)));
 		loggers.add(new FileLogger());
+		screenLogger = new ScreenLogger();
+		loggers.add(screenLogger);
 
-        timerEvent = new TimerEvent(this);
-        sensorEvent = new SensorEvent(this, ctx);
+        accelerometerEvent = new AccelerometerEvent(this, ctx);
 		locationEvent = new LocationEvent(this, ctx);
 		telephonyEvent = new TelephonyEvent(this, ctx);
+        timerEvent = new TimerEvent(this);
 				
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "PtimulusMission");

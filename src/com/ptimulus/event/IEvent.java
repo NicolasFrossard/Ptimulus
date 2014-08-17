@@ -14,4 +14,15 @@ public interface IEvent {
      * Disable the event source.
      */
     public void stopListening();
+
+    /**
+     * Timer tick from the service. Assumed to be 1Hz.
+     */
+    public void tick();
+
+    /**
+     * Age of the last measure, in milliseconds.
+     * @return
+     */
+    public long dataAge();
 }

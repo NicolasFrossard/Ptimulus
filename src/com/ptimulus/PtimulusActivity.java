@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +18,10 @@ import android.widget.TextView;
 
 import com.ptimulus.utils.DateFactory;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Handler;
+
 public class PtimulusActivity extends Activity {
 
     private PtimulusService service = null;
@@ -24,18 +29,7 @@ public class PtimulusActivity extends Activity {
 	private TextView gpsTextView;
 	private TextView phoneStateTextView;
 	private TextView sensorStateTextView;
-
-	public void updateLocation(String newLocation) {
-        gpsTextView.setText("Last GPS received at " + DateFactory.nowAsString() + ": " + newLocation);
-	}
-
-	public void updatePhoneState(String newState) {
-		phoneStateTextView.setText("State received at " + DateFactory.nowAsString() + ": " + newState);
-	}
-
-	public void updateSensorState(String newSensorState) {
-        phoneStateTextView.setText("Sensor state received at " + DateFactory.nowAsString() + ": " + newSensorState);
-    }
+	private TextView logTextView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -52,9 +46,6 @@ public class PtimulusActivity extends Activity {
 		View ruler = new View(this); 
 		ruler.setBackgroundColor(0xFFFFFFFF);
 		
-		View ruler2 = new View(this); 
-		ruler2.setBackgroundColor(0xFFFFFFFF);
-		
 		ll.addView(ruler, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 2));
 		index++;
 		
@@ -62,6 +53,9 @@ public class PtimulusActivity extends Activity {
 		phoneStateTextView.setText("No phone state received yet");
 		ll.addView(phoneStateTextView, index++);
 
+		View ruler2 = new View(this); 
+		ruler2.setBackgroundColor(0xFFFFFFFF);
+		
 		ll.addView(ruler2, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 2));
 		index++;
 		
@@ -78,8 +72,44 @@ public class PtimulusActivity extends Activity {
         button.setText("Let's take a little picture");
         ll.addView(button, index++);
         
+		View ruler3 = new View(this); 
+		ruler3.setBackgroundColor(0xFFFFFFFF);
+		
+		ll.addView(ruler3, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 2));
+		index++;
+		
+		logTextView = new TextView(this);
+		logTextView.setText("No log received yet");
+		ll.addView(logTextView, index++);
+        
 		setContentView(ll);
+
+
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateGUI();
+                    }
+                });
+            }
+        }, 0, 1000);
 	}
+
+    private void updateGUI() {
+        if(service == null)
+            return;
+
+        gpsTextView.setText(service.locationUIdata());
+        phoneStateTextView.setText(service.telephonyUIdata());
+        sensorStateTextView.setText(service.accelerometerUIdata());
+        logTextView.setText(service.logUIData());
+    }
+
 
     @Override
     public void onStart() {

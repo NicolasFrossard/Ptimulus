@@ -2,7 +2,6 @@ package com.ptimulus.log;
 
 import android.telephony.SmsManager;
 
-import com.ptimulus.PtimulusApplication;
 import com.ptimulus.utils.DateFactory;
 
 public class SmsLogger implements IPtimulusLogger {
