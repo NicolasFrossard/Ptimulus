@@ -136,7 +136,9 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         active = true;
 
         // Play a audio file to mark the start
-        MediaPlayer.create(ctx, R.raw.ready).start();
+        MediaPlayer player = MediaPlayer.create(ctx, R.raw.ready);
+        player.start();
+        player.release();
     }
 
     public void stop() {
