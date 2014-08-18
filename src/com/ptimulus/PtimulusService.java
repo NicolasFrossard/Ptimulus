@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.hardware.SensorEvent;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Binder;
@@ -110,6 +111,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
     private TimerEvent timerEvent;
 	private LocationEvent locationEvent;
     private AccelerometerEvent accelerometerEvent;
+    private MagnetometerEvent magnetometerEvent;
 	private TelephonyEvent telephonyEvent;
 
     private final IBinder binder = new PtimulusServiceBinder();
@@ -125,6 +127,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
             return;
 
         accelerometerEvent.startListening();
+        magnetometerEvent.startListening();
         locationEvent.startListening();
         telephonyEvent.startListening();
 
@@ -146,6 +149,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
             return;
 
         accelerometerEvent.stopListening();
+        magnetometerEvent.stopListening();
         locationEvent.stopListening();
         telephonyEvent.stopListening();
 
@@ -162,6 +166,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         locationEvent.tick();
         telephonyEvent.tick();
         accelerometerEvent.tick();
+        magnetometerEvent.tick();
     }
 
     public void locationEvent(Location l) {
@@ -170,7 +175,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         relayLog(LogEntryType.GPS, text);
     }
 
-    public void sensorEvent(android.hardware.SensorEvent event) {
+    public void accelEvent(SensorEvent event) {
         StringBuilder data = new StringBuilder();
 
         for (float f : event.values) {
@@ -178,8 +183,19 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
             data.append(f);
         }
 
-        relayLog(LogEntryType.SENSOR, data.toString());
+        relayLog(LogEntryType.ACCEL, data.toString());
     }
+    
+    public void magnEvent(SensorEvent event) {
+    	StringBuilder data = new StringBuilder();
+
+        for (float f : event.values) {
+            data.append(" ");
+            data.append(f);
+        }
+
+        relayLog(LogEntryType.MAGN, data.toString());
+	}
 
     public void telephonyEvent(ServiceState serviceState) {
         relayLog(LogEntryType.PHONE_STATE, serviceState.toString());
@@ -190,7 +206,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
      * @param type
      * @param entry
      */
-    private void relayLog(LogEntryType type, String entry) {
+    public void relayLog(LogEntryType type, String entry) {
         for(IPtimulusLogger logger : loggers)
             logger.logDataEvent(type, entry);
     }
@@ -202,15 +218,19 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
     public String accelerometerUIdata() {
         return accelerometerEvent.toString();
     }
+    
+    public String magnetometerUIdata() {
+		return magnetometerEvent.toString();
+	}
 
     public String telephonyUIdata() {
         return telephonyEvent.toString();
     }
     
-	public CharSequence logUIData() {
+	public String logUIData() {
 		return screenLogger.toString();
 	}
-
+	
     public static void activateIfNecessary(Context ctx) {
         if (isEnabled(ctx)) {
             Intent startIntent = new Intent(ctx, PtimulusService.class);
@@ -274,6 +294,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 		loggers.add(screenLogger);
 
         accelerometerEvent = new AccelerometerEvent(this, ctx);
+        magnetometerEvent = new MagnetometerEvent(this, ctx);
 		locationEvent = new LocationEvent(this, ctx);
 		telephonyEvent = new TelephonyEvent(this, ctx);
         timerEvent = new TimerEvent(this);

@@ -8,25 +8,25 @@ import android.hardware.SensorManager;
 
 import com.ptimulus.PtimulusService;
 
-public class AccelerometerEvent implements SensorEventListener, IEvent {
+public class MagnetometerEvent implements SensorEventListener, IEvent {
 
     private final PtimulusService ptimulusService;
 	private final SensorManager sensorManager;
-    private final Sensor accelerometer;
+    private final Sensor magnetometer;
     
     private final Object lock = new Object();
     
 	private SensorEvent lastSensorEvent;
     private long lastSensorEventTime;
 
-	public AccelerometerEvent(PtimulusService ptimulusService, Context ctx) {
+	public MagnetometerEvent(PtimulusService ptimulusService, Context ctx) {
         this.ptimulusService = ptimulusService;
         this.lastSensorEvent = null;
         this.lastSensorEventTime = 0;
 		
 		// Find the accelerometer
 		sensorManager = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 	}
 
     /**
@@ -34,10 +34,10 @@ public class AccelerometerEvent implements SensorEventListener, IEvent {
      */
     @Override
     public void startListening() {
-        boolean accelSupported = sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        boolean magnSupported = sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
 
-        if (!accelSupported) {
-            sensorManager.unregisterListener(this, accelerometer);
+        if (!magnSupported) {
+            sensorManager.unregisterListener(this, magnetometer);
         }
     }
 
@@ -56,7 +56,7 @@ public class AccelerometerEvent implements SensorEventListener, IEvent {
     public void tick() {
     	synchronized (lock) {
     		if(lastSensorEvent != null)
-                ptimulusService.accelEvent(lastSensorEvent);
+                ptimulusService.magnEvent(lastSensorEvent);
 		}
     }
 
@@ -71,7 +71,7 @@ public class AccelerometerEvent implements SensorEventListener, IEvent {
     	
     	synchronized (lock) {
             if(lastSensorEvent == null)
-                return "No accelerometer event yet";
+                return "No magnetometer event yet";
             
             x = lastSensorEvent.values[0];
             y = lastSensorEvent.values[1];
@@ -79,8 +79,9 @@ public class AccelerometerEvent implements SensorEventListener, IEvent {
 		}
        
         double magn = Math.sqrt(x*x + y*y + z*z) / 9.81d; 
-        return String.format("%d sec | %.3f G",
+        return String.format("%d sec | X %.3f Y %.3f Z %.3f | magn %.3f µT",
         		Math.round(dataAge() / 1000f),
+        		x, y, z,
         		magn);
     }
 

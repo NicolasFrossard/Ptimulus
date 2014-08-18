@@ -2,7 +2,8 @@ package com.ptimulus.log;
 
 public enum LogEntryType {
 	GPS,
-	SENSOR,
+	ACCEL,
+	MAGN,
 	PHONE_STATE,
 	APP_LIFECYCLE
 }

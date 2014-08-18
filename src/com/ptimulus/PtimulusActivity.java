@@ -25,7 +25,8 @@ public class PtimulusActivity extends Activity {
 
 	private TextView gpsTextView;
 	private TextView phoneStateTextView;
-	private TextView sensorStateTextView;
+	private TextView accelStateTextView;
+	private TextView magnStateTextView;
 	private TextView logTextView;
 
 	@Override
@@ -54,9 +55,19 @@ public class PtimulusActivity extends Activity {
 		ll.addView(ruler2, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2));
 		index++;
 		
-		sensorStateTextView = new TextView(this);
-		sensorStateTextView.setText("No sensor state received yet");
-		ll.addView(sensorStateTextView, index++);
+		accelStateTextView = new TextView(this);
+		accelStateTextView.setText("No accelerometer state received yet");
+		ll.addView(accelStateTextView, index++);
+		
+		View ruler4 = new View(this); 
+		ruler4.setBackgroundColor(0xFFFFFFFF);
+		
+		ll.addView(ruler4, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 2));
+		index++;
+		
+		magnStateTextView = new TextView(this);
+		magnStateTextView.setText("No magnetometer state received yet");
+		ll.addView(magnStateTextView, index++);
 		
 		final Button button = new Button(this);
         button.setOnClickListener(new View.OnClickListener() {
@@ -75,7 +86,7 @@ public class PtimulusActivity extends Activity {
 		logTextView = new TextView(this);
 		logTextView.setText("No log received yet");
 		ll.addView(logTextView, index++);
-        
+		
 		setContentView(ll);
 
         Timer t = new Timer();
@@ -98,7 +109,8 @@ public class PtimulusActivity extends Activity {
 
         gpsTextView.setText(service.locationUIdata());
         phoneStateTextView.setText(service.telephonyUIdata());
-        sensorStateTextView.setText(service.accelerometerUIdata());
+        accelStateTextView.setText(service.accelerometerUIdata());
+        magnStateTextView.setText(service.magnetometerUIdata());
         logTextView.setText(service.logUIData());
     }
 
