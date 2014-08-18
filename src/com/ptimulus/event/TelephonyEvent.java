@@ -11,6 +11,8 @@ public class TelephonyEvent implements IEvent {
 
     private final PtimulusService ptimulusService;
 
+    private final Object lock = new Object();
+    
     private boolean listening;
     private ServiceState lastServiceState;
     private long lastSetviceStateTime;
@@ -59,10 +61,12 @@ public class TelephonyEvent implements IEvent {
 
     @Override
     public String toString() {
-        if(lastServiceState == null)
-            return "No Telephony event yet";
+    	synchronized (lock) {
+    		if(lastServiceState == null)
+                return "No Telephony event yet";
 
-        return String.format("%d sec | %s", Math.round(dataAge() / 1000f), lastServiceState.toString());
+            return String.format("%d sec | %s", Math.round(dataAge() / 1000f), lastServiceState.toString());
+		}
     }
 
     /**
@@ -72,9 +76,11 @@ public class TelephonyEvent implements IEvent {
 
 		@Override
 		public void onServiceStateChanged(ServiceState serviceState) {
-			lastServiceState = serviceState;
-            if(listening)
-                ptimulusService.telephonyEvent(serviceState);
+			synchronized (lock) {
+				lastServiceState = serviceState;
+	            if(listening)
+	                ptimulusService.telephonyEvent(serviceState);
+			}
 		}
 	}
 }

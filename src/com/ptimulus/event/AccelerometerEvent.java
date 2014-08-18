@@ -13,7 +13,9 @@ public class AccelerometerEvent implements SensorEventListener, IEvent {
     private final PtimulusService ptimulusService;
 	private final SensorManager sensorManager;
     private final Sensor accelerometer;
-
+    
+    private final Object lock = new Object();
+    
 	private SensorEvent lastSensorEvent;
     private long lastSensorEventTime;
 
@@ -52,23 +54,29 @@ public class AccelerometerEvent implements SensorEventListener, IEvent {
      */
     @Override
     public void tick() {
-        if(lastSensorEvent != null)
-            ptimulusService.sensorEvent(lastSensorEvent);
+    	synchronized (lock) {
+    		if(lastSensorEvent != null)
+                ptimulusService.sensorEvent(lastSensorEvent);
+		}
     }
 
     @Override
     public long dataAge() {
-        return System.currentTimeMillis() - lastSensorEventTime;
+    	return System.currentTimeMillis() - lastSensorEventTime;
     }
 
     @Override
     public String toString() {
-        if(lastSensorEvent == null)
-            return "No Telephony event yet";
-        
-        float x = lastSensorEvent.values[0];
-        float y = lastSensorEvent.values[1];
-        float z = lastSensorEvent.values[2];
+    	float x,y,z;
+    	
+    	synchronized (lock) {
+            if(lastSensorEvent == null)
+                return "No Telephony event yet";
+            
+            x = lastSensorEvent.values[0];
+            y = lastSensorEvent.values[1];
+            z = lastSensorEvent.values[2];
+		}
        
         double magn = Math.sqrt(x*x + y*y + z*z) / 9.81d; 
         return String.format("%d sec | %.3f G",
@@ -78,8 +86,10 @@ public class AccelerometerEvent implements SensorEventListener, IEvent {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        lastSensorEventTime = System.currentTimeMillis();
-        lastSensorEvent = sensorEvent;
+    	synchronized (lock) {
+    		lastSensorEventTime = System.currentTimeMillis();
+            lastSensorEvent = sensorEvent;
+		}
     }
 
     @Override

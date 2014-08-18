@@ -19,6 +19,8 @@ public class LocationEvent implements LocationListener, IEvent {
     private final PtimulusService ptimulusService;
 	private final LocationManager gps;
 	private final String locationProvider;
+	
+	private final Object lock = new Object();
 
     private Location lastLocation;
     private long lastLocationTime;
@@ -55,8 +57,10 @@ public class LocationEvent implements LocationListener, IEvent {
      */
     @Override
     public void tick() {
-        if(lastLocation != null)
-            ptimulusService.locationEvent(lastLocation);
+    	synchronized (lock) {
+    		if(lastLocation != null)
+                ptimulusService.locationEvent(lastLocation);
+		}
     }
 
     /**
@@ -71,19 +75,23 @@ public class LocationEvent implements LocationListener, IEvent {
 
     @Override
     public String toString() {
-        if(lastLocation == null)
-            return "No GPS event yet";
+    	synchronized (lock) {
+    		if(lastLocation == null)
+                return "No GPS event yet";
 
-        return String.format("%d sec | %s|%s  alt %s",
-        		Math.round(dataAge() / 1000f),
-        		Location.convert(lastLocation.getLatitude(), Location.FORMAT_MINUTES),
-        		Location.convert(lastLocation.getLongitude(), Location.FORMAT_MINUTES),
-        		lastLocation.getAltitude());
+            return String.format("%d sec | %s|%s  alt %s",
+            		Math.round(dataAge() / 1000f),
+            		Location.convert(lastLocation.getLatitude(), Location.FORMAT_MINUTES),
+            		Location.convert(lastLocation.getLongitude(), Location.FORMAT_MINUTES),
+            		lastLocation.getAltitude());
+    	}
     }
 
     public void onLocationChanged(Location l) {
-        lastLocation = l;
-        lastLocationTime = System.currentTimeMillis();
+    	synchronized (lock) {
+    		lastLocation = l;
+            lastLocationTime = System.currentTimeMillis();
+    	}
 	}
 
     @Override
