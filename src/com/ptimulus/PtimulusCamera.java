@@ -10,7 +10,7 @@ import com.ptimulus.utils.DateFactory;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
-import android.hardware.Camera.CameraInfo;
+//import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
 import android.os.Environment;
 import android.util.Log;
@@ -24,8 +24,9 @@ public class PtimulusCamera {
 
 		Toast.makeText(ctx, "Taking picture...", Toast.LENGTH_LONG).show();
 		
-		int camId = findFrontFacingCamera();
-		Camera mCamera = Camera.open(camId);
+		Camera mCamera = Camera.open();
+		//int camId = findFrontFacingCamera();
+		//Camera mCamera = Camera.open(camId);
 		
 		Camera.Parameters params = mCamera.getParameters();
         params.setWhiteBalance(Parameters.WHITE_BALANCE_AUTO);
@@ -80,6 +81,7 @@ public class PtimulusCamera {
 		return "pic_" + DateFactory.nowForPhotoFilename() + ".jpg";
 	}
 
+	/*
 	private static int findFrontFacingCamera() {  
 		
 		int cameraId = -1;  
@@ -99,7 +101,7 @@ public class PtimulusCamera {
         
 		return cameraId;  
     }
-
+*/
 	private static void releaseCamera(Camera camera) {
 	    if (camera != null) {
 	    	camera.release();
