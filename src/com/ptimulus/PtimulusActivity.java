@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
@@ -44,9 +45,8 @@ public class PtimulusActivity extends Activity {
 		ll.addView(gpsTextView, index++);
 		
 		View ruler = new View(this); 
-		ruler.setBackgroundColor(0xFFFFFFFF);
-		
-		ll.addView(ruler, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 2));
+		ruler.setBackgroundColor(Color.WHITE);
+		ll.addView(ruler, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2));
 		index++;
 		
 		phoneStateTextView = new TextView(this);
@@ -54,9 +54,8 @@ public class PtimulusActivity extends Activity {
 		ll.addView(phoneStateTextView, index++);
 
 		View ruler2 = new View(this); 
-		ruler2.setBackgroundColor(0xFFFFFFFF);
-		
-		ll.addView(ruler2, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 2));
+		ruler2.setBackgroundColor(Color.WHITE);
+		ll.addView(ruler2, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2));
 		index++;
 		
 		sensorStateTextView = new TextView(this);
@@ -73,9 +72,8 @@ public class PtimulusActivity extends Activity {
         ll.addView(button, index++);
         
 		View ruler3 = new View(this); 
-		ruler3.setBackgroundColor(0xFFFFFFFF);
-		
-		ll.addView(ruler3, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 2));
+		ruler3.setBackgroundColor(Color.WHITE);
+		ll.addView(ruler3, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2));
 		index++;
 		
 		logTextView = new TextView(this);
@@ -84,12 +82,10 @@ public class PtimulusActivity extends Activity {
         
 		setContentView(ll);
 
-
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -109,7 +105,6 @@ public class PtimulusActivity extends Activity {
         sensorStateTextView.setText(service.accelerometerUIdata());
         logTextView.setText(service.logUIData());
     }
-
 
     @Override
     public void onStart() {
