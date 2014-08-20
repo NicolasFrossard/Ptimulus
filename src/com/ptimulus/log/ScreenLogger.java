@@ -17,9 +17,11 @@ public class ScreenLogger implements IPtimulusLogger {
 	
 	@Override
 	public void logDataEvent(LogEntryType type, String entry) {
-		buffer.add(DateFactory.nowAsString() + " | " + type + ": " + entry	+ " ");
-		if(buffer.size() > QUEUE_SIZE)
-			buffer.remove();
+        synchronized (buffer) {
+            buffer.add(DateFactory.nowAsString() + " | " + type + ": " + entry + " ");
+            if (buffer.size() > QUEUE_SIZE)
+                buffer.remove();
+        }
 	}
 
 	@Override
@@ -35,11 +37,12 @@ public class ScreenLogger implements IPtimulusLogger {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-	
-		
-		for(Iterator<String> it = buffer.descendingIterator(); it.hasNext(); ) {
-			builder.append(it.next() + "\n");
-		}
+
+        synchronized (buffer) {
+            for (Iterator<String> it = buffer.descendingIterator(); it.hasNext(); ) {
+                builder.append(it.next() + "\n");
+            }
+        }
 		
 		return builder.toString();
 	}
