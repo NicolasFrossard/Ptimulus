@@ -8,7 +8,6 @@ import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,11 +16,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.ptimulus.utils.DateFactory;
-
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Handler;
 
 public class PtimulusActivity extends Activity {
 
