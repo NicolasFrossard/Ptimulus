@@ -1,6 +1,6 @@
 package com.ptimulus.log;
 
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.ptimulus.utils.DateFactory;
@@ -8,11 +8,11 @@ import com.ptimulus.utils.DateFactory;
 public class ScreenLogger implements IPtimulusLogger {
 
 	private final int QUEUE_SIZE = 10;
-	private final ArrayDeque<String> buffer;
+    private final ArrayList<String> buffer;
 	
 	
 	public ScreenLogger() {
-		this.buffer = new ArrayDeque<String>(QUEUE_SIZE + 1);
+		this.buffer = new ArrayList<String>(QUEUE_SIZE + 1);
 	}
 	
 	@Override
@@ -20,7 +20,7 @@ public class ScreenLogger implements IPtimulusLogger {
         synchronized (buffer) {
             buffer.add(DateFactory.nowAsString() + " | " + type + ": " + entry + " ");
             if (buffer.size() > QUEUE_SIZE)
-                buffer.remove();
+                buffer.remove(0);
         }
 	}
 
@@ -39,8 +39,8 @@ public class ScreenLogger implements IPtimulusLogger {
 		StringBuilder builder = new StringBuilder();
 
         synchronized (buffer) {
-            for (Iterator<String> it = buffer.descendingIterator(); it.hasNext(); ) {
-                builder.append(it.next() + "\n");
+            for (Iterator<String> it = buffer.iterator(); it.hasNext(); ) {
+                builder.insert(0, it.next() + "\r\n");
             }
         }
 		
