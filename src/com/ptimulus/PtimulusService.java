@@ -126,14 +126,14 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         if (active)
             return;
 
+        for(IPtimulusLogger logger : loggers) {
+            logger.startLogging();
+        }
+        
         accelerometerEvent.startListening();
         magnetometerEvent.startListening();
         locationEvent.startListening();
         telephonyEvent.startListening();
-
-        for(IPtimulusLogger logger : loggers) {
-            logger.startLogging();
-        }
 
         wl.acquire();
         active = true;
