@@ -8,6 +8,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 
 import com.ptimulus.PtimulusService;
+import com.ptimulus.log.LogEntryType;
 
 /**
  * Retrieve the GPS/Locations event and feed them to the service.
@@ -17,8 +18,8 @@ import com.ptimulus.PtimulusService;
 public class LocationEvent implements LocationListener, IEvent {
 
     private final PtimulusService ptimulusService;
-	private final LocationManager gps;
-	private final String locationProvider;
+	private final LocationManager locationManager;
+	//private final String locationProvider;
 	
 	private final Object lock = new Object();
 
@@ -30,13 +31,7 @@ public class LocationEvent implements LocationListener, IEvent {
         this.lastLocation = null;
         this.lastLocationTime = 0;
 
-		// set up gps
-		gps = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
-		Criteria c = new Criteria();
-		c.setAccuracy(Criteria.ACCURACY_FINE);
-		c.setAltitudeRequired(true);
-		c.setSpeedRequired(true);
-		locationProvider = gps.getBestProvider(c, true);
+		locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
 	}
 
     /**
@@ -44,12 +39,23 @@ public class LocationEvent implements LocationListener, IEvent {
      */
     @Override
     public void startListening() {
-        gps.requestLocationUpdates(locationProvider, 0, 0, this);
+    	if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+    	{
+    		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+    		ptimulusService.relayLog(LogEntryType.GPS, "Started listening GPS provider");
+    	}
+
+    	if(locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+    	{
+    		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
+    		ptimulusService.relayLog(LogEntryType.GPS, "Started listening Network provider");
+    	}
+    		
     }
 
     @Override
     public void stopListening() {
-        gps.removeUpdates(this);
+        locationManager.removeUpdates(this);
     }
 
     /**
@@ -79,7 +85,7 @@ public class LocationEvent implements LocationListener, IEvent {
     		if(lastLocation == null)
                 return "No GPS event yet";
 
-            return String.format("%d sec | %s|%s  alt %s",
+            return String.format("%d sec | %s|%s  alt %.1f",
             		Math.round(dataAge() / 1000f),
             		Location.convert(lastLocation.getLatitude(), Location.FORMAT_MINUTES),
             		Location.convert(lastLocation.getLongitude(), Location.FORMAT_MINUTES),
