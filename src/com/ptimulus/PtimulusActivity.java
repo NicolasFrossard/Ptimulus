@@ -107,10 +107,10 @@ public class PtimulusActivity extends Activity {
         if(service == null)
             return;
 
-        gpsTextView.setText(service.locationUIdata());
-        phoneStateTextView.setText(service.telephonyUIdata());
-        accelStateTextView.setText(service.accelerometerUIdata());
-        magnStateTextView.setText(service.magnetometerUIdata());
+        gpsTextView.setText(service.locationUIData());
+        phoneStateTextView.setText(service.telephonyUIData());
+        accelStateTextView.setText(service.accelerometerUIData());
+        magnStateTextView.setText(service.magnetometerUIData());
         logTextView.setText(service.logUIData());
     }
 
@@ -154,7 +154,6 @@ public class PtimulusActivity extends Activity {
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             PtimulusService.PtimulusServiceBinder binder = (PtimulusService.PtimulusServiceBinder) iBinder;
             service = binder.getService();
-            binder.registerActivity(PtimulusActivity.this);
         }
 
         @Override

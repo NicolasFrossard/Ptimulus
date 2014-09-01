@@ -12,15 +12,11 @@ import android.text.format.DateFormat;
 public abstract class DateFactory {
 
 	public static String format(long time) {
-		return DateFormat.format("yyyy-MM-dd HH:mm:ss", time).toString();
+		return DateFormat.format("yyyy-MM-dd kk:mm:ss", time).toString();
 	}
 
     public static String nowForFilename() {
-        return DateFormat.format("yyyy-MM-dd_HH-mm", new Date().getTime()).toString();
-    }
-	
-    public static String nowForPhotoFilename() {
-        return DateFormat.format("yyyy-MM-dd_HH-mm-ss", new Date().getTime()).toString();
+        return DateFormat.format("yyyy-MM-dd_kk-mm-ss", new Date().getTime()).toString();
     }
     
 	public static String nowAsString() {

@@ -72,7 +72,7 @@ public class PtimulusCamera {
 	}
 
 	private static String generateFileName() {
-		return "pic_" + DateFactory.nowForPhotoFilename() + ".jpg";
+		return "pic_" + DateFactory.nowForFilename() + ".jpg";
 	}
 
 	private static void releaseCamera(Camera camera) {

@@ -56,7 +56,7 @@ public class MagnetometerEvent implements SensorEventListener, IEvent {
     public void tick() {
     	synchronized (lock) {
     		if(lastSensorEvent != null)
-                ptimulusService.magnEvent(lastSensorEvent);
+                ptimulusService.magnetometerEvent(lastSensorEvent);
 		}
     }
 
@@ -79,7 +79,7 @@ public class MagnetometerEvent implements SensorEventListener, IEvent {
 		}
        
         double magn = Math.sqrt(x*x + y*y + z*z) / 9.81d; 
-        return String.format("%d sec | X %.3f Y %.3f Z %.3f | magn %.3f µT",
+        return String.format("%d sec | X %.3f Y %.3f Z %.3f | magn %.3f ÂµT",
         		Math.round(dataAge() / 1000f),
         		x, y, z,
         		magn);

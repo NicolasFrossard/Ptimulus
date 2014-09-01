@@ -56,7 +56,7 @@ public class AccelerometerEvent implements SensorEventListener, IEvent {
     public void tick() {
     	synchronized (lock) {
     		if(lastSensorEvent != null)
-                ptimulusService.accelEvent(lastSensorEvent);
+                ptimulusService.accelerometerEvent(lastSensorEvent);
 		}
     }
 

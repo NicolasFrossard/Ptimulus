@@ -15,13 +15,13 @@ public class TelephonyEvent implements IEvent {
     
     private boolean listening;
     private ServiceState lastServiceState;
-    private long lastSetviceStateTime;
+    private long lastServiceStateTime;
 
     public TelephonyEvent(PtimulusService ptimulusService, Context ctx) {
         this.ptimulusService = ptimulusService;
         this.listening = false;
         this.lastServiceState = null;
-        this.lastSetviceStateTime = 0;
+        this.lastServiceStateTime = 0;
 
         TelephonyManager telephonyManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
 		telephonyManager.listen(new TelephonyStateAdaptor(), PhoneStateListener.LISTEN_SERVICE_STATE);
@@ -56,7 +56,7 @@ public class TelephonyEvent implements IEvent {
      */
     @Override
     public long dataAge() {
-        return System.currentTimeMillis() - lastSetviceStateTime;
+        return System.currentTimeMillis() - lastServiceStateTime;
     }
 
     @Override
@@ -78,6 +78,7 @@ public class TelephonyEvent implements IEvent {
 		public void onServiceStateChanged(ServiceState serviceState) {
 			synchronized (lock) {
 				lastServiceState = serviceState;
+                lastServiceStateTime = System.currentTimeMillis();
 	            if(listening)
 	                ptimulusService.telephonyEvent(serviceState);
 			}

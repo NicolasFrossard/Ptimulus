@@ -21,6 +21,7 @@ import android.os.PowerManager;
 import android.telephony.ServiceState;
 import com.ptimulus.event.*;
 import com.ptimulus.log.*;
+import com.ptimulus.utils.SmsSender;
 
 /*
 Done using PlantUML: http://plantuml.sourceforge.net/
@@ -101,68 +102,27 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 
     public final String DEFAULT_DEST_NUMBER = "2096270247";
 
-    private boolean active;
 	private PowerManager pm;
 	private PowerManager.WakeLock wl;
+    private MediaPlayer player;
 
     private final List<IPtimulusLogger> loggers = new ArrayList<IPtimulusLogger>();
     private ScreenLogger screenLogger;
 
     private TimerEvent timerEvent;
+    private SmsSender smsSender;
 	private LocationEvent locationEvent;
     private AccelerometerEvent accelerometerEvent;
     private MagnetometerEvent magnetometerEvent;
 	private TelephonyEvent telephonyEvent;
 
     private final IBinder binder = new PtimulusServiceBinder();
-    private PtimulusActivity activity;
 
 	public PtimulusService() {
 		super();
-		active = false;
 	}
 
-    public void start(Context ctx) {
-        if (active)
-            return;
-
-        for(IPtimulusLogger logger : loggers) {
-            logger.startLogging();
-        }
-        
-        accelerometerEvent.startListening();
-        magnetometerEvent.startListening();
-        locationEvent.startListening();
-        telephonyEvent.startListening();
-
-        wl.acquire();
-        active = true;
-
-        // Play a audio file to mark the start
-        MediaPlayer player = MediaPlayer.create(ctx, R.raw.ready);
-        player.start();
-        player.release();
-    }
-
-    public void stop() {
-        if (!active)
-            return;
-
-        accelerometerEvent.stopListening();
-        magnetometerEvent.stopListening();
-        locationEvent.stopListening();
-        telephonyEvent.stopListening();
-
-        for(IPtimulusLogger logger : loggers) {
-            logger.stopLogging();
-        }
-
-        wl.release();
-        active = false;
-    }
-
     public void timerTick() {
-
         locationEvent.tick();
         telephonyEvent.tick();
         accelerometerEvent.tick();
@@ -175,7 +135,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         relayLog(LogEntryType.GPS, text);
     }
 
-    public void accelEvent(SensorEvent event) {
+    public void accelerometerEvent(SensorEvent event) {
         StringBuilder data = new StringBuilder();
 
         for (float f : event.values) {
@@ -186,7 +146,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         relayLog(LogEntryType.ACCEL, data.toString());
     }
     
-    public void magnEvent(SensorEvent event) {
+    public void magnetometerEvent(SensorEvent event) {
     	StringBuilder data = new StringBuilder();
 
         for (float f : event.values) {
@@ -211,24 +171,27 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
             logger.logDataEvent(type, entry);
     }
 
-    public String locationUIdata() {
+    public String locationUIData() {
         return locationEvent.toString();
     }
 
-    public String accelerometerUIdata() {
+    public String accelerometerUIData() {
         return accelerometerEvent.toString();
     }
     
-    public String magnetometerUIdata() {
+    public String magnetometerUIData() {
 		return magnetometerEvent.toString();
 	}
 
-    public String telephonyUIdata() {
+    public String telephonyUIData() {
         return telephonyEvent.toString();
     }
     
 	public String logUIData() {
-		return screenLogger.toString();
+        if(isEnabled(getApplicationContext()))
+		    return screenLogger.toString();
+        else
+            return "Logging disabled";
 	}
 	
     public static void activateIfNecessary(Context ctx) {
@@ -243,36 +206,35 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 				.getPtimulusPreferences().getBoolean("enableLogging", false);
 	}
 
-	private static Notification updateNotification(Context ctx, boolean enabled) {
-		NotificationManager notificationManager = (NotificationManager) ctx
+	private Notification updateNotification(String message) {
+        Context ctx = getApplicationContext();
+        NotificationManager notificationManager = (NotificationManager) ctx
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		if (enabled) {
-			Notification n = new Notification(R.drawable.ptimuluslogo,
-					"Ptimulus is Active", System.currentTimeMillis());
+        Notification n = new Notification(R.drawable.ptimuluslogo,
+                message, System.currentTimeMillis());
 
-			n.flags |= Notification.FLAG_ONGOING_EVENT;
-			Intent ni = new Intent(ctx, PtimulusActivity.class);
+        n.flags |= Notification.FLAG_ONGOING_EVENT;
+        Intent ni = new Intent(ctx, PtimulusActivity.class);
 
-			PendingIntent pi = PendingIntent.getActivity(ctx, 0, ni, 0);
-			n.setLatestEventInfo(ctx, "Ptimulus", "Ptimulus is active", pi);
-			notificationManager.notify(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE, n);
+        PendingIntent pi = PendingIntent.getActivity(ctx, 0, ni, 0);
+        n.setLatestEventInfo(ctx, "Ptimulus", message, pi);
+        notificationManager.notify(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE, n);
 
-			return n;
-		} else {
-			notificationManager.cancel(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE);
-			return null;
-		}
+        return n;
 	}
+
+    private void StopNotification() {
+        Context ctx = getApplicationContext();
+        NotificationManager notificationManager = (NotificationManager) ctx
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE);
+    }
 
     public class PtimulusServiceBinder extends Binder {
 
         public PtimulusService getService() {
             return PtimulusService.this;
-        }
-
-        public void registerActivity(PtimulusActivity activity) {
-            PtimulusService.this.activity = activity;
         }
     }
 
@@ -288,7 +250,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         Context ctx = getApplicationContext();
         SharedPreferences preferences = ((PtimulusApplication) ctx).getPtimulusPreferences();
 
-		loggers.add(new SmsLogger(preferences.getString("targetPhoneNumber", DEFAULT_DEST_NUMBER)));
+        smsSender = new SmsSender(preferences.getString("targetPhoneNumber", DEFAULT_DEST_NUMBER));
 		loggers.add(new FileLogger());
 		screenLogger = new ScreenLogger();
 		loggers.add(screenLogger);
@@ -301,24 +263,57 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 				
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "PtimulusMission");
-		
-		start(this);
+
+        for(IPtimulusLogger logger : loggers) {
+            logger.startLogging();
+        }
+
+        relayLog(LogEntryType.APP_LIFECYCLE, "Starting the service.");
+
+        accelerometerEvent.startListening();
+        magnetometerEvent.startListening();
+        locationEvent.startListening();
+        telephonyEvent.startListening();
+
+        wl.acquire();
+
+        // Play a audio file to mark the start
+        player = MediaPlayer.create(ctx, R.raw.ready);
+        player.start();
+
         preferences.registerOnSharedPreferenceChangeListener(this);
 
-		Notification n = updateNotification(this, true);
+		Notification n = updateNotification("Ptimulus is active");
 		startForeground(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE, n);
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		stop();
+
+        accelerometerEvent.stopListening();
+        magnetometerEvent.stopListening();
+        locationEvent.stopListening();
+        telephonyEvent.stopListening();
+
+        relayLog(LogEntryType.APP_LIFECYCLE, "Stopping the service.");
+
+        for(IPtimulusLogger logger : loggers) {
+            logger.stopLogging();
+        }
+
+        player.reset();
+        player.release();
+
+        wl.release();
+
         ((PtimulusApplication) getApplicationContext()).getPtimulusPreferences().unregisterOnSharedPreferenceChangeListener(this);
-		updateNotification(this, false);
+		StopNotification();
 	}
 
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		if (!isEnabled(this))
+		if (!isEnabled(getApplicationContext()))
 			stopSelf();
+        smsSender.UpdateDestination(sharedPreferences.getString("targetPhoneNumber", DEFAULT_DEST_NUMBER));
 	}
 }
