@@ -15,11 +15,10 @@ import com.ptimulus.log.LogEntryType;
  * @author nicolas
  *
  */
-public class LocationEvent implements LocationListener, IEvent {
+    public class LocationEvent implements LocationListener, IEvent {
 
     private final PtimulusService ptimulusService;
-	private final LocationManager locationManager;
-	//private final String locationProvider;
+    private final LocationManager locationManager;
 	
 	private final Object lock = new Object();
 
@@ -85,11 +84,12 @@ public class LocationEvent implements LocationListener, IEvent {
     		if(lastLocation == null)
                 return "No GPS event yet";
 
-            return String.format("%d sec | %s|%s  alt %.1f",
+            return String.format("%d sec | %s|%s  alt %.1f %s",
             		Math.round(dataAge() / 1000f),
             		Location.convert(lastLocation.getLatitude(), Location.FORMAT_MINUTES),
             		Location.convert(lastLocation.getLongitude(), Location.FORMAT_MINUTES),
-            		lastLocation.getAltitude());
+            		lastLocation.getAltitude(),
+                    lastLocation.hasAccuracy() ? String.format("acc %.1f", lastLocation.getAccuracy()) : "");
     	}
     }
 

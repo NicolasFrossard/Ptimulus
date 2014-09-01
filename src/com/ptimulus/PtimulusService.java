@@ -130,7 +130,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
     }
 
     public void locationEvent(Location l) {
-        String text = String.format("%s,%s %s", l.getLatitude(), l.getLongitude(), l.getAltitude());
+        String text = String.format("%s,%s %s %s", l.getLatitude(), l.getLongitude(), l.getAltitude(), l.getAccuracy());
 
         relayLog(LogEntryType.GPS, text);
     }
