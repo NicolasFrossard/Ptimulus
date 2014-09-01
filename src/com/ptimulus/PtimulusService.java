@@ -114,6 +114,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 	private LocationEvent locationEvent;
     private AccelerometerEvent accelerometerEvent;
     private MagnetometerEvent magnetometerEvent;
+    private GyroscopeEvent gyroscopeEvent;
 	private TelephonyEvent telephonyEvent;
 
     private final IBinder binder = new PtimulusServiceBinder();
@@ -127,6 +128,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         telephonyEvent.tick();
         accelerometerEvent.tick();
         magnetometerEvent.tick();
+        gyroscopeEvent.tick();
     }
 
     public void locationEvent(Location l) {
@@ -157,6 +159,17 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         relayLog(LogEntryType.MAGN, data.toString());
 	}
 
+    public void gyroscopeEvent(SensorEvent event) {
+        StringBuilder data = new StringBuilder();
+
+        for (float f : event.values) {
+            data.append(" ");
+            data.append(f);
+        }
+
+        relayLog(LogEntryType.GYRO, data.toString());
+    }
+
     public void telephonyEvent(ServiceState serviceState) {
         relayLog(LogEntryType.PHONE_STATE, serviceState.toString());
     }
@@ -182,6 +195,10 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
     public String magnetometerUIData() {
 		return magnetometerEvent.toString();
 	}
+
+    public String gyroscopeUIData() {
+        return gyroscopeEvent.toString();
+    }
 
     public String telephonyUIData() {
         return telephonyEvent.toString();
@@ -242,6 +259,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 
         accelerometerEvent = new AccelerometerEvent(this, ctx);
         magnetometerEvent = new MagnetometerEvent(this, ctx);
+        gyroscopeEvent = new GyroscopeEvent(this, ctx);
 		locationEvent = new LocationEvent(this, ctx);
 		telephonyEvent = new TelephonyEvent(this, ctx);
         timerEvent = new TimerEvent(this);
@@ -257,6 +275,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 
         accelerometerEvent.startListening();
         magnetometerEvent.startListening();
+        gyroscopeEvent.startListening();
         locationEvent.startListening();
         telephonyEvent.startListening();
 
@@ -278,6 +297,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 
         accelerometerEvent.stopListening();
         magnetometerEvent.stopListening();
+        gyroscopeEvent.stopListening();
         locationEvent.stopListening();
         telephonyEvent.stopListening();
 
