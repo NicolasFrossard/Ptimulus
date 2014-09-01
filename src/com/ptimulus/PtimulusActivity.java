@@ -133,14 +133,6 @@ public class PtimulusActivity extends Activity {
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        if(service != null)
-            unbindService(connection);
-    }
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
@@ -157,6 +149,7 @@ public class PtimulusActivity extends Activity {
                 break;
             case 1:
                 Intent intent = new Intent(this, PtimulusService.class);
+                unbindService(connection);
                 stopService(intent);
                 break;
         }
