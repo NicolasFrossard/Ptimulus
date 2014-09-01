@@ -28,7 +28,10 @@ public class PtimulusCamera {
         params.setWhiteBalance(Parameters.WHITE_BALANCE_AUTO);
         params.setSceneMode(Parameters.SCENE_MODE_AUTO);
         params.setExposureCompensation(params.getMaxExposureCompensation());
-        params.setJpegQuality(100);
+
+        // Jpg quality set to 90% to divide by 2 the image size.
+        // The difference in quality is not noticeable, and even the devs of the JPEG format said that 100% was useless.
+        params.setJpegQuality(90);
         
         mCamera.setParameters(params);
 
