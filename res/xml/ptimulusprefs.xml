@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
-<CheckBoxPreference android:key="enableLogging" android:title="Enable Logging" android:summaryOn="Logging is enabled" android:summaryOff="Logging is disabled"></CheckBoxPreference>
 <EditTextPreference android:summary="Destination phone number of SMS status messages" android:title="Report to" android:key="targetPhoneNumber" android:defaultValue="5556"></EditTextPreference>
 </PreferenceScreen>

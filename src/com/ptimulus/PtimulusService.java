@@ -188,22 +188,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
     }
     
 	public String logUIData() {
-        if(isEnabled(getApplicationContext()))
-		    return screenLogger.toString();
-        else
-            return "Logging disabled";
-	}
-	
-    public static void activateIfNecessary(Context ctx) {
-        if (isEnabled(ctx)) {
-            Intent startIntent = new Intent(ctx, PtimulusService.class);
-            ctx.startService(startIntent);
-        }
-    }
-
-	private static boolean isEnabled(Context ctx) {
-		return ((PtimulusApplication) ctx.getApplicationContext())
-				.getPtimulusPreferences().getBoolean("enableLogging", false);
+		return screenLogger.toString();
 	}
 
 	private Notification updateNotification(String message) {
@@ -312,8 +297,6 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 	}
 
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		if (!isEnabled(getApplicationContext()))
-			stopSelf();
         smsSender.UpdateDestination(sharedPreferences.getString("targetPhoneNumber", DEFAULT_DEST_NUMBER));
 	}
 }

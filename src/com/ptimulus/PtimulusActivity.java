@@ -119,6 +119,7 @@ public class PtimulusActivity extends Activity {
         super.onStart();
 
         Intent intent = new Intent(this, PtimulusService.class);
+        startService(intent);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
@@ -131,21 +132,25 @@ public class PtimulusActivity extends Activity {
     }
 
 	@Override
-	public void onResume() {
-		super.onResume();
-		PtimulusService.activateIfNecessary(this);
-	}
-
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		menu.add(0, 0, 0, "Settings");
+		menu.add(Menu.NONE, 0, Menu.NONE, "Settings");
+        menu.add(Menu.NONE, 1, Menu.NONE, "Exit the service");
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		startActivity(new Intent(this, PtimulusPreferenceActivity.class));
+        switch(item.getItemId()) {
+            case 0:
+                startActivity(new Intent(this, PtimulusPreferenceActivity.class));
+                break;
+            case 1:
+                Intent intent = new Intent(this, PtimulusService.class);
+                stopService(intent);
+                break;
+        }
+
 		return (true);
 	}
 

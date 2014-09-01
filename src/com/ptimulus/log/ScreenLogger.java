@@ -11,13 +11,19 @@ public class ScreenLogger implements IPtimulusLogger {
     private final ArrayList<String> buffer;
 	
 	private final Object lock = new Object();
+
+    private boolean logging;
 	
 	public ScreenLogger() {
         this.buffer = new ArrayList<String>(QUEUE_SIZE + 1);
+        logging = false;
 	}
 	
 	@Override
 	public void logDataEvent(LogEntryType type, String entry) {
+        if (!logging)
+            return;
+
 		synchronized (lock) {
 			buffer.add(DateFactory.nowAsString() + " | " + type + ": " + entry	+ " ");
 			if(buffer.size() > QUEUE_SIZE)
@@ -27,12 +33,12 @@ public class ScreenLogger implements IPtimulusLogger {
 
 	@Override
 	public void startLogging() {
-		
+        logging = true;
 	}
 
 	@Override
 	public void stopLogging() {
-
+        logging = false;
 	}
 	
 	@Override
