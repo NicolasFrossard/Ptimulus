@@ -12,10 +12,12 @@ public class TimerEvent {
 
     private PtimulusService ptimulusService;
     private Timer timer;
+    private int counter;
 
     public TimerEvent(PtimulusService ptimulusService)
     {
         this.ptimulusService = ptimulusService;
+        this.counter = 0;
         this.timer = new Timer();
         this.timer.scheduleAtFixedRate(task, 0, 1000);
     }
@@ -23,7 +25,8 @@ public class TimerEvent {
     private TimerTask task = new TimerTask() {
         @Override
         public void run() {
-            ptimulusService.timerTick();
+            ptimulusService.timerTick(counter);
+            counter++;
         }
     };
 }

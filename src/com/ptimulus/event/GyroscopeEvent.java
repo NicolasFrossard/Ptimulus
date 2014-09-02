@@ -7,7 +7,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import com.ptimulus.PtimulusService;
 
-public class GyroscopeEvent implements SensorEventListener, IEvent {
+public class GyroscopeEvent implements SensorEventListener, IEvent<SensorEvent> {
 
     private final PtimulusService ptimulusService;
 	private final SensorManager sensorManager;
@@ -62,6 +62,26 @@ public class GyroscopeEvent implements SensorEventListener, IEvent {
     @Override
     public long dataAge() {
     	return System.currentTimeMillis() - lastSensorEventTime;
+    }
+
+    /**
+     * The last know measure.
+     *
+     * @return
+     */
+    @Override
+    public SensorEvent data() {
+        return lastSensorEvent;
+    }
+
+    /**
+     * Tell if we have a valid data already;
+     *
+     * @return
+     */
+    @Override
+    public boolean hasData() {
+        return lastSensorEvent != null;
     }
 
     @Override

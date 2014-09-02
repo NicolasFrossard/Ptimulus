@@ -7,7 +7,7 @@ import android.telephony.TelephonyManager;
 
 import com.ptimulus.PtimulusService;
 
-public class TelephonyEvent implements IEvent {
+public class TelephonyEvent implements IEvent<ServiceState> {
 
     private final PtimulusService ptimulusService;
 
@@ -57,6 +57,33 @@ public class TelephonyEvent implements IEvent {
     @Override
     public long dataAge() {
         return System.currentTimeMillis() - lastServiceStateTime;
+    }
+
+    /**
+     * The last know measure.
+     *
+     * @return
+     */
+    @Override
+    public ServiceState data() {
+        return lastServiceState;
+    }
+
+    /**
+     * Tell if we have a valid data already;
+     *
+     * @return
+     */
+    @Override
+    public boolean hasData() {
+        return lastServiceState != null;
+    }
+
+    public boolean hasTelephonyNetwork() {
+        if(!hasData())
+            return false;
+
+        return lastServiceState.getState() == ServiceState.STATE_IN_SERVICE;
     }
 
     @Override

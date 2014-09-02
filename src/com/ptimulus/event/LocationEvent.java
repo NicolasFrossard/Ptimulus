@@ -1,7 +1,6 @@
 package com.ptimulus.event;
 
 import android.content.Context;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -10,12 +9,14 @@ import android.os.Bundle;
 import com.ptimulus.PtimulusService;
 import com.ptimulus.log.LogEntryType;
 
+import java.util.Locale;
+
 /**
  * Retrieve the GPS/Locations event and feed them to the service.
  * @author nicolas
  *
  */
-    public class LocationEvent implements LocationListener, IEvent {
+    public class LocationEvent implements LocationListener, IEvent<Location> {
 
     private final PtimulusService ptimulusService;
     private final LocationManager locationManager;
@@ -78,6 +79,26 @@ import com.ptimulus.log.LogEntryType;
         return System.currentTimeMillis() - lastLocationTime;
     }
 
+    /**
+     * The last know measure.
+     *
+     * @return
+     */
+    @Override
+    public Location data() {
+        return lastLocation;
+    }
+
+    /**
+     * Tell if we have a valid data already;
+     *
+     * @return
+     */
+    @Override
+    public boolean hasData() {
+        return lastLocation != null;
+    }
+
     @Override
     public String toString() {
     	synchronized (lock) {
@@ -91,6 +112,13 @@ import com.ptimulus.log.LogEntryType;
             		lastLocation.getAltitude(),
                     lastLocation.hasAccuracy() ? String.format("acc %.1f", lastLocation.getAccuracy()) : "");
     	}
+    }
+
+    public String toStringSMS() {
+        return String.format(Locale.US, "%s\nhttp://maps.google.com/?q=%.6f,%.6f",
+                toString(),
+                lastLocation.getLatitude(),
+                lastLocation.getLongitude());
     }
 
     public void onLocationChanged(Location l) {

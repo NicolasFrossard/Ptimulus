@@ -119,16 +119,99 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 
     private final IBinder binder = new PtimulusServiceBinder();
 
+    private long locationSentTime = -1000;
+
 	public PtimulusService() {
 		super();
 	}
 
-    public void timerTick() {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        Context ctx = getApplicationContext();
+        SharedPreferences preferences = ((PtimulusApplication) ctx).getPtimulusPreferences();
+
+        smsSender = new SmsSender(preferences.getString("targetPhoneNumber", DEFAULT_DEST_NUMBER));
+        loggers.add(new FileLogger());
+        screenLogger = new ScreenLogger();
+        loggers.add(screenLogger);
+
+        accelerometerEvent = new AccelerometerEvent(this, ctx);
+        magnetometerEvent = new MagnetometerEvent(this, ctx);
+        gyroscopeEvent = new GyroscopeEvent(this, ctx);
+        locationEvent = new LocationEvent(this, ctx);
+        telephonyEvent = new TelephonyEvent(this, ctx);
+        timerEvent = new TimerEvent(this);
+
+        pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "PtimulusMission");
+
+        for(IPtimulusLogger logger : loggers) {
+            logger.startLogging();
+        }
+
+        relayLog(LogEntryType.APP_LIFECYCLE, "Starting the service.");
+        smsSender.SendSMS("Ptimulus service started.");
+
+        accelerometerEvent.startListening();
+        magnetometerEvent.startListening();
+        gyroscopeEvent.startListening();
+        locationEvent.startListening();
+        telephonyEvent.startListening();
+
+        wl.acquire();
+
+        // Play a audio file to mark the start
+        player = MediaPlayer.create(ctx, R.raw.ready);
+        player.start();
+
+        preferences.registerOnSharedPreferenceChangeListener(this);
+
+        Notification n = updateNotification("Ptimulus is active");
+        startForeground(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE, n);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        accelerometerEvent.stopListening();
+        magnetometerEvent.stopListening();
+        gyroscopeEvent.stopListening();
+        locationEvent.stopListening();
+        telephonyEvent.stopListening();
+
+        relayLog(LogEntryType.APP_LIFECYCLE, "Stopping the service.");
+
+        for(IPtimulusLogger logger : loggers) {
+            logger.stopLogging();
+        }
+
+        player.reset();
+        player.release();
+
+        wl.release();
+
+        ((PtimulusApplication) getApplicationContext()).getPtimulusPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        StopNotification();
+    }
+
+    public void timerTick(int counter) {
         locationEvent.tick();
         telephonyEvent.tick();
         accelerometerEvent.tick();
         magnetometerEvent.tick();
         gyroscopeEvent.tick();
+
+        if(telephonyEvent.hasTelephonyNetwork() &&
+                locationEvent.hasData() &&
+                counter - locationSentTime > 30)
+        {
+            locationSentTime = counter;
+            smsSender.SendSMS(locationEvent.toStringSMS());
+            relayLog(LogEntryType.APP_LIFECYCLE, "Location Sent");
+        }
     }
 
     public void locationEvent(Location l) {
@@ -243,77 +326,6 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 	@Override
 	public IBinder onBind(Intent intent) {
 		return binder;
-	}
-
-	@Override
-	public void onCreate() {
-		super.onCreate();
-
-        Context ctx = getApplicationContext();
-        SharedPreferences preferences = ((PtimulusApplication) ctx).getPtimulusPreferences();
-
-        smsSender = new SmsSender(preferences.getString("targetPhoneNumber", DEFAULT_DEST_NUMBER));
-		loggers.add(new FileLogger());
-		screenLogger = new ScreenLogger();
-		loggers.add(screenLogger);
-
-        accelerometerEvent = new AccelerometerEvent(this, ctx);
-        magnetometerEvent = new MagnetometerEvent(this, ctx);
-        gyroscopeEvent = new GyroscopeEvent(this, ctx);
-		locationEvent = new LocationEvent(this, ctx);
-		telephonyEvent = new TelephonyEvent(this, ctx);
-        timerEvent = new TimerEvent(this);
-				
-		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "PtimulusMission");
-
-        for(IPtimulusLogger logger : loggers) {
-            logger.startLogging();
-        }
-
-        relayLog(LogEntryType.APP_LIFECYCLE, "Starting the service.");
-
-        accelerometerEvent.startListening();
-        magnetometerEvent.startListening();
-        gyroscopeEvent.startListening();
-        locationEvent.startListening();
-        telephonyEvent.startListening();
-
-        wl.acquire();
-
-        // Play a audio file to mark the start
-        player = MediaPlayer.create(ctx, R.raw.ready);
-        player.start();
-
-        preferences.registerOnSharedPreferenceChangeListener(this);
-
-		Notification n = updateNotification("Ptimulus is active");
-		startForeground(PtimulusApplication.NOTIFY_PTIMULUS_ACTIVE, n);
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-
-        accelerometerEvent.stopListening();
-        magnetometerEvent.stopListening();
-        gyroscopeEvent.stopListening();
-        locationEvent.stopListening();
-        telephonyEvent.stopListening();
-
-        relayLog(LogEntryType.APP_LIFECYCLE, "Stopping the service.");
-
-        for(IPtimulusLogger logger : loggers) {
-            logger.stopLogging();
-        }
-
-        player.reset();
-        player.release();
-
-        wl.release();
-
-        ((PtimulusApplication) getApplicationContext()).getPtimulusPreferences().unregisterOnSharedPreferenceChangeListener(this);
-		StopNotification();
 	}
 
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
