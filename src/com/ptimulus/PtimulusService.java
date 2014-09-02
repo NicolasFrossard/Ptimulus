@@ -121,6 +121,9 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 
     private long locationSentTime = -1000;
 
+    private int TAKE_PICTURE_INTERVAL = 120;
+    private long pictureTakenTime = -TAKE_PICTURE_INTERVAL;
+    
 	public PtimulusService() {
 		super();
 	}
@@ -212,6 +215,13 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
             smsSender.SendSMS(locationEvent.toStringSMS());
             relayLog(LogEntryType.APP_LIFECYCLE, "Location Sent");
         }
+        
+        if(counter - pictureTakenTime >= TAKE_PICTURE_INTERVAL)
+        {
+        	pictureTakenTime = counter;
+            PtimulusCamera.takePicture(this);	
+        }
+        
     }
 
     public void locationEvent(Location l) {

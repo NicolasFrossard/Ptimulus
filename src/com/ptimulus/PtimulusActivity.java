@@ -29,7 +29,7 @@ public class PtimulusActivity extends Activity {
 	private TextView magnStateTextView;
     private TextView gyroStateTextView;
 	private TextView logTextView;
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -78,15 +78,6 @@ public class PtimulusActivity extends Activity {
         gyroStateTextView.setText("No gyroscope state received yet");
         ll.addView(gyroStateTextView, index++);
 		
-		final Button button = new Button(this);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-        		PtimulusCamera.takePicture(getApplicationContext());
-            }
-        });
-        button.setText("Let's take a little picture");
-        ll.addView(button, index++);
-        
 		View ruler3 = new View(this); 
 		ruler3.setBackgroundColor(Color.WHITE);
 		ll.addView(ruler3, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2));
