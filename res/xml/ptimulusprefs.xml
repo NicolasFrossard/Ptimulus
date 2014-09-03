@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
-<EditTextPreference android:summary="Destination phone number of SMS status messages" android:title="Report to" android:key="targetPhoneNumber" android:defaultValue="5556"></EditTextPreference>
+    <EditTextPreference
+        android:summary="Destination phone number of SMS status messages"
+        android:title="Report to #1"
+        android:key="targetPhoneNumber1"
+        android:defaultValue=""/>
+    <EditTextPreference
+        android:summary="Destination phone number of SMS status messages"
+        android:title="Report to #2"
+        android:key="targetPhoneNumber2"
+        android:defaultValue=""/>
+    <EditTextPreference
+        android:summary="Destination phone number of SMS status messages"
+        android:title="Report to #3"
+        android:key="targetPhoneNumber3"
+        android:defaultValue=""/>
 </PreferenceScreen>

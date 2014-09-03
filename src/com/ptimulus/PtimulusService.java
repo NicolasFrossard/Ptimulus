@@ -18,6 +18,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 
+import android.preference.Preference;
 import android.telephony.ServiceState;
 import com.ptimulus.event.*;
 import com.ptimulus.log.*;
@@ -135,7 +136,11 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         Context ctx = getApplicationContext();
         SharedPreferences preferences = ((PtimulusApplication) ctx).getPtimulusPreferences();
 
-        smsSender = new SmsSender(preferences.getString("targetPhoneNumber", DEFAULT_DEST_NUMBER));
+        smsSender = new SmsSender(this,
+                preferences.getString("targetPhoneNumber1", DEFAULT_DEST_NUMBER),
+                preferences.getString("targetPhoneNumber2", DEFAULT_DEST_NUMBER),
+                preferences.getString("targetPhoneNumber3", DEFAULT_DEST_NUMBER));
+
         loggers.add(new FileLogger());
         screenLogger = new ScreenLogger();
         loggers.add(screenLogger);
@@ -339,6 +344,8 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 	}
 
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        smsSender.UpdateDestination(sharedPreferences.getString("targetPhoneNumber", DEFAULT_DEST_NUMBER));
+        smsSender.UpdateDestination1(sharedPreferences.getString("targetPhoneNumber1", DEFAULT_DEST_NUMBER));
+        smsSender.UpdateDestination2(sharedPreferences.getString("targetPhoneNumber2", DEFAULT_DEST_NUMBER));
+        smsSender.UpdateDestination3(sharedPreferences.getString("targetPhoneNumber3", DEFAULT_DEST_NUMBER));
 	}
 }

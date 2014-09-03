@@ -6,6 +6,7 @@ public enum LogEntryType {
 	MAGN,
     GYRO,
 	PHONE_STATE,
-	APP_LIFECYCLE,
-	CAMERA
+    SMS,
+    CAMERA,
+	APP_LIFECYCLE
 }
