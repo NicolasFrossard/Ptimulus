@@ -18,7 +18,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 
-import android.preference.Preference;
 import android.telephony.ServiceState;
 import com.ptimulus.event.*;
 import com.ptimulus.log.*;
@@ -101,8 +100,6 @@ Descent --> Upload
 
 public class PtimulusService extends Service implements OnSharedPreferenceChangeListener {
 
-    public final String DEFAULT_DEST_NUMBER = "2096270247";
-
 	private PowerManager pm;
 	private PowerManager.WakeLock wl;
     private MediaPlayer player;
@@ -137,9 +134,9 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         SharedPreferences preferences = ((PtimulusApplication) ctx).getPtimulusPreferences();
 
         smsSender = new SmsSender(this,
-                preferences.getString("targetPhoneNumber1", DEFAULT_DEST_NUMBER),
-                preferences.getString("targetPhoneNumber2", DEFAULT_DEST_NUMBER),
-                preferences.getString("targetPhoneNumber3", DEFAULT_DEST_NUMBER));
+                preferences.getString("targetPhoneNumber1", ""),
+                preferences.getString("targetPhoneNumber2", ""),
+                preferences.getString("targetPhoneNumber3", ""));
 
         loggers.add(new FileLogger());
         screenLogger = new ScreenLogger();
@@ -344,8 +341,8 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 	}
 
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        smsSender.UpdateDestination1(sharedPreferences.getString("targetPhoneNumber1", DEFAULT_DEST_NUMBER));
-        smsSender.UpdateDestination2(sharedPreferences.getString("targetPhoneNumber2", DEFAULT_DEST_NUMBER));
-        smsSender.UpdateDestination3(sharedPreferences.getString("targetPhoneNumber3", DEFAULT_DEST_NUMBER));
+        smsSender.UpdateDestination1(sharedPreferences.getString("targetPhoneNumber1", ""));
+        smsSender.UpdateDestination2(sharedPreferences.getString("targetPhoneNumber2", ""));
+        smsSender.UpdateDestination3(sharedPreferences.getString("targetPhoneNumber3", ""));
 	}
 }
