@@ -107,12 +107,14 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
     private final List<IPtimulusLogger> loggers = new ArrayList<IPtimulusLogger>();
     private ScreenLogger screenLogger;
 
+    private final List<IEvent<? extends Object>> events = new ArrayList<IEvent<? extends Object>>();
     private TimerEvent timerEvent;
     private SmsSender smsSender;
 	private LocationEvent locationEvent;
     private AccelerometerEvent accelerometerEvent;
     private MagnetometerEvent magnetometerEvent;
     private GyroscopeEvent gyroscopeEvent;
+    private BatteryEvent batteryEvent;
 	private TelephonyEvent telephonyEvent;
 
     private final IBinder binder = new PtimulusServiceBinder();
@@ -139,14 +141,15 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
                 preferences.getString("targetPhoneNumber3", ""));
 
         loggers.add(new FileLogger());
-        screenLogger = new ScreenLogger();
-        loggers.add(screenLogger);
+        loggers.add(screenLogger = new ScreenLogger());
 
-        accelerometerEvent = new AccelerometerEvent(this, ctx);
-        magnetometerEvent = new MagnetometerEvent(this, ctx);
-        gyroscopeEvent = new GyroscopeEvent(this, ctx);
-        locationEvent = new LocationEvent(this, ctx);
-        telephonyEvent = new TelephonyEvent(this, ctx);
+        events.add(accelerometerEvent = new AccelerometerEvent(this, ctx));
+        events.add(magnetometerEvent = new MagnetometerEvent(this, ctx));
+        events.add(gyroscopeEvent = new GyroscopeEvent(this, ctx));
+        events.add(batteryEvent = new BatteryEvent(this, ctx));
+        events.add(locationEvent = new LocationEvent(this, ctx));
+        events.add(telephonyEvent = new TelephonyEvent(this, ctx));
+
         timerEvent = new TimerEvent(this);
 
         pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -159,11 +162,10 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         relayLog(LogEntryType.APP_LIFECYCLE, "Starting the service.");
         smsSender.SendSMS("Ptimulus service started.");
 
-        accelerometerEvent.startListening();
-        magnetometerEvent.startListening();
-        gyroscopeEvent.startListening();
-        locationEvent.startListening();
-        telephonyEvent.startListening();
+
+        for(IEvent event : events) {
+            event.startListening();
+        }
 
         wl.acquire();
 
@@ -181,11 +183,9 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
     public void onDestroy() {
         super.onDestroy();
 
-        accelerometerEvent.stopListening();
-        magnetometerEvent.stopListening();
-        gyroscopeEvent.stopListening();
-        locationEvent.stopListening();
-        telephonyEvent.stopListening();
+        for(IEvent event : events) {
+            event.stopListening();
+        }
 
         relayLog(LogEntryType.APP_LIFECYCLE, "Stopping the service.");
 
@@ -203,11 +203,9 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
     }
 
     public void timerTick(int counter) {
-        locationEvent.tick();
-        telephonyEvent.tick();
-        accelerometerEvent.tick();
-        magnetometerEvent.tick();
-        gyroscopeEvent.tick();
+        for(IEvent event : events) {
+            event.tick(counter);
+        }
 
         if(telephonyEvent.hasTelephonyNetwork() &&
                 locationEvent.hasData() &&
@@ -265,6 +263,13 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         relayLog(LogEntryType.GYRO, data.toString());
     }
 
+    public void batteryEvent(BatteryEvent.BatteryState event) {
+        String text = String.format("%f %f %f", event.temp, event.voltage, event.percent);
+
+        relayLog(LogEntryType.BAT, text);
+    }
+
+
     public void telephonyEvent(ServiceState serviceState) {
         relayLog(LogEntryType.PHONE_STATE, serviceState.toString());
     }
@@ -293,6 +298,10 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 
     public String gyroscopeUIData() {
         return gyroscopeEvent.toString();
+    }
+
+    public String batteryUIData() {
+        return batteryEvent.toString();
     }
 
     public String telephonyUIData() {

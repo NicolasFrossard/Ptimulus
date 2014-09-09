@@ -52,7 +52,7 @@ public class GyroscopeEvent implements SensorEventListener, IEvent<SensorEvent> 
      * Timer tick from the service. Assumed to be 1Hz.
      */
     @Override
-    public void tick() {
+    public void tick(int counter) {
     	synchronized (lock) {
     		if(lastSensorEvent != null)
                 ptimulusService.gyroscopeEvent(lastSensorEvent);

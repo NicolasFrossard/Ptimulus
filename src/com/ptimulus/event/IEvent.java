@@ -18,7 +18,7 @@ public interface IEvent<DataType> {
     /**
      * Timer tick from the service. Assumed to be 1Hz.
      */
-    public void tick();
+    public void tick(int counter);
 
     /**
      * Age of the last measure, in milliseconds.

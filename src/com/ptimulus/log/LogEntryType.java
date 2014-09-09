@@ -5,6 +5,7 @@ public enum LogEntryType {
 	ACCEL,
 	MAGN,
     GYRO,
+    BAT,
 	PHONE_STATE,
     SMS,
     CAMERA,

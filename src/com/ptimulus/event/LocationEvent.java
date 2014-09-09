@@ -62,7 +62,7 @@ import java.util.Locale;
      * Timer tick from the service. Assumed to be 1Hz.
      */
     @Override
-    public void tick() {
+    public void tick(int counter) {
     	synchronized (lock) {
     		if(lastLocation != null)
                 ptimulusService.locationEvent(lastLocation);

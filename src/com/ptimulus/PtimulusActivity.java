@@ -28,6 +28,7 @@ public class PtimulusActivity extends Activity {
 	private TextView accelStateTextView;
 	private TextView magnStateTextView;
     private TextView gyroStateTextView;
+    private TextView batStateTextView;
 	private TextView logTextView;
 	
 	@Override
@@ -77,6 +78,15 @@ public class PtimulusActivity extends Activity {
         gyroStateTextView = new TextView(this);
         gyroStateTextView.setText("No gyroscope state received yet");
         ll.addView(gyroStateTextView, index++);
+
+        View ruler6 = new View(this);
+        ruler6.setBackgroundColor(Color.WHITE);
+        ll.addView(ruler6, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 2));
+        index++;
+
+        batStateTextView = new TextView(this);
+        batStateTextView.setText("No batterie state received yet");
+        ll.addView(batStateTextView, index++);
 		
 		View ruler3 = new View(this); 
 		ruler3.setBackgroundColor(Color.WHITE);
@@ -112,6 +122,7 @@ public class PtimulusActivity extends Activity {
         accelStateTextView.setText(service.accelerometerUIData());
         magnStateTextView.setText(service.magnetometerUIData());
         gyroStateTextView.setText(service.gyroscopeUIData());
+        batStateTextView.setText(service.batteryUIData());
         logTextView.setText(service.logUIData());
     }
 

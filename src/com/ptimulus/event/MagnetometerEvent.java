@@ -53,7 +53,7 @@ public class MagnetometerEvent implements SensorEventListener, IEvent<SensorEven
      * Timer tick from the service. Assumed to be 1Hz.
      */
     @Override
-    public void tick() {
+    public void tick(int counter) {
     	synchronized (lock) {
     		if(lastSensorEvent != null)
                 ptimulusService.magnetometerEvent(lastSensorEvent);

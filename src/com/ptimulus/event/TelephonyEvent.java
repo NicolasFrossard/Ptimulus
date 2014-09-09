@@ -47,7 +47,7 @@ public class TelephonyEvent implements IEvent<ServiceState> {
      * Timer tick from the service. Assumed to be 1Hz.
      */
     @Override
-    public void tick() {}
+    public void tick(int counter) {}
 
     /**
      * Age of the last measure, in milliseconds.
