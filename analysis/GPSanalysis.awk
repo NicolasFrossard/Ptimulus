@@ -1,4 +1,4 @@
-# usage: grep "GPS" *.log | grep -v "Started" | awk -f analysis.awk > GPS.kml
+# usage: grep -h "GPS" *.log | grep -v "Started" | awk -f analysis.awk > GPS.kml
 
 BEGIN { FS = "[, ]"; print "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"\
 "<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n"\
@@ -21,12 +21,37 @@ BEGIN { FS = "[, ]"; print "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"\
 "      <LineString>\n"\
 "        <extrude>1</extrude>\n"\
 "        <tessellate>1</tessellate>\n"\
-"        <altitudeMode>clampToGround</altitudeMode>\n"\
+"        <altitudeMode>absolute</altitudeMode>\n"\
 "        <coordinates>"; }
-{ print $6","$5","$7 }
+{ print $6","$5","round($7) }
 
 END { print "</coordinates>\n"\
 "      </LineString>\n"\
 "    </Placemark>\n"\
 "  </Document>\n"\
 "</kml>\n"; }
+
+function round(x, ival, aval, fraction)
+{
+   ival = int(x)    # integer part, int() truncates
+
+   # see if fractional part
+   if (ival == x)   # no fraction
+      return ival   # ensure no decimals
+
+   if (x < 0) {
+      aval = -x     # absolute value
+      ival = int(aval)
+      fraction = aval - ival
+      if (fraction >= .5)
+         return int(x) - 1   # -2.5 --> -3
+      else
+         return int(x)       # -2.3 --> -2
+   } else {
+      fraction = x - ival
+      if (fraction >= .5)
+         return ival + 1
+      else
+         return ival
+   }
+}
