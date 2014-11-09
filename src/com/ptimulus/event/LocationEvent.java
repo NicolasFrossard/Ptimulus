@@ -126,12 +126,17 @@ import java.util.Locale;
     		if(lastLocation == null)
                 return "No GPS event yet";
 
-            return String.format("%d sec | %s|%s  alt %.1f %s",
-            		Math.round(dataAge() / 1000f),
-            		Location.convert(lastLocation.getLatitude(), Location.FORMAT_MINUTES),
-            		Location.convert(lastLocation.getLongitude(), Location.FORMAT_MINUTES),
-            		lastLocation.getAltitude(),
-                    lastLocation.hasAccuracy() ? String.format("acc %.1f", lastLocation.getAccuracy()) : "");
+            return String.format(
+                    Locale.US,
+                    "%d sec | %s|%s  alt %.1f %s",
+                    Math.round(dataAge() / 1000f),
+                    Location.convert(lastLocation.getLatitude(),
+                            Location.FORMAT_MINUTES),
+                    Location.convert(lastLocation.getLongitude(),
+                            Location.FORMAT_MINUTES),
+                    lastLocation.getAltitude(),
+                    lastLocation.hasAccuracy() ? String.format(Locale.US,
+                            "acc %.1f", lastLocation.getAccuracy()) : "");
     	}
     }
 

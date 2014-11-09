@@ -21,11 +21,14 @@
 
 package com.ptimulus.event;
 
+import java.util.Locale;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+
 import com.ptimulus.PtimulusService;
 
 public class GyroscopeEvent implements SensorEventListener, IEvent<SensorEvent> {
@@ -118,7 +121,7 @@ public class GyroscopeEvent implements SensorEventListener, IEvent<SensorEvent> 
             z = lastSensorEvent.values[2];
 		}
 
-        return String.format("%d sec | X %.3f Y %.3f Z %.3f rad/s",
+        return String.format(Locale.US, "%d sec | X %.3f Y %.3f Z %.3f rad/s",
         		Math.round(dataAge() / 1000f),
         		x, y, z);
     }

@@ -21,11 +21,14 @@
 
 package com.ptimulus.event;
 
+import java.util.Locale;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
+
 import com.ptimulus.PtimulusService;
 
 public class BatteryEvent extends BroadcastReceiver implements IEvent<BatteryEvent.BatteryState> {
@@ -106,7 +109,8 @@ public class BatteryEvent extends BroadcastReceiver implements IEvent<BatteryEve
             return "No battery event yet";
 
     	synchronized (lock) {
-            return String.format("%d sec | temp %.2f°C volt %.2fV char %.2f%%",
+    	    // Unicode symbol for degree Celsius is U+2103
+            return String.format(Locale.US, "%d sec | temp %.2f\u2103 volt %.2fV char %.2f%%",
                     Math.round(dataAge() / 1000f),
                     lastSensorEvent.temp,
                     lastSensorEvent.voltage,

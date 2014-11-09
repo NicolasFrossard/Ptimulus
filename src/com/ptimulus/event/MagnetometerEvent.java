@@ -21,6 +21,8 @@
 
 package com.ptimulus.event;
 
+import java.util.Locale;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -120,7 +122,7 @@ public class MagnetometerEvent implements SensorEventListener, IEvent<SensorEven
 		}
        
         double magn = Math.sqrt(x*x + y*y + z*z) / 9.81d; 
-        return String.format("%d sec | X %.3f Y %.3f Z %.3f | magn %.3f µT",
+        return String.format(Locale.US, "%d sec | X %.3f Y %.3f Z %.3f | magn %.3f µT",
         		Math.round(dataAge() / 1000f),
         		x, y, z,
         		magn);

@@ -21,6 +21,8 @@
 
 package com.ptimulus.event;
 
+import java.util.Locale;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -120,7 +122,7 @@ public class AccelerometerEvent implements SensorEventListener, IEvent<SensorEve
 		}
        
         double magn = Math.sqrt(x*x + y*y + z*z) / 9.81d; 
-        return String.format("%d sec | %.3f G",
+        return String.format(Locale.US, "%d sec | %.3f G",
         		Math.round(dataAge() / 1000f),
         		magn);
     }

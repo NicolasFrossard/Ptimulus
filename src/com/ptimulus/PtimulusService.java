@@ -23,6 +23,7 @@ package com.ptimulus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -38,8 +39,8 @@ import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
-
 import android.telephony.ServiceState;
+
 import com.ptimulus.event.*;
 import com.ptimulus.log.*;
 import com.ptimulus.utils.SmsSender;
@@ -121,30 +122,31 @@ Descent --> Upload
 
 public class PtimulusService extends Service implements OnSharedPreferenceChangeListener {
 
-	private PowerManager pm;
-	private PowerManager.WakeLock wl;
-    private MediaPlayer player;
+    private PowerManager                         pm;
+    private PowerManager.WakeLock                wl;
+    private MediaPlayer                          player;
 
-    private final List<IPtimulusLogger> loggers = new ArrayList<IPtimulusLogger>();
-    private ScreenLogger screenLogger;
+    private final List<IPtimulusLogger>          loggers               = new ArrayList<IPtimulusLogger>();
+    private ScreenLogger                         screenLogger;
 
-    private final List<IEvent<? extends Object>> events = new ArrayList<IEvent<? extends Object>>();
-    private TimerEvent timerEvent;
-    private SmsSender smsSender;
-	private LocationEvent locationEvent;
-    private AccelerometerEvent accelerometerEvent;
-    private MagnetometerEvent magnetometerEvent;
-    private GyroscopeEvent gyroscopeEvent;
-    private BatteryEvent batteryEvent;
-	private TelephonyEvent telephonyEvent;
-	private PtimulusCamera mCamera = null;
+    private final List<IEvent<? extends Object>> events                = new ArrayList<IEvent<? extends Object>>();
+    @SuppressWarnings("unused")
+    private TimerEvent                           timerEvent;
+    private SmsSender                            smsSender;
+    private LocationEvent                        locationEvent;
+    private AccelerometerEvent                   accelerometerEvent;
+    private MagnetometerEvent                    magnetometerEvent;
+    private GyroscopeEvent                       gyroscopeEvent;
+    private BatteryEvent                         batteryEvent;
+    private TelephonyEvent                       telephonyEvent;
+    private PtimulusCamera                       mCamera               = null;
 
-    private final IBinder binder = new PtimulusServiceBinder();
+    private final IBinder                        binder                = new PtimulusServiceBinder();
 
-    private long locationSentTime = -1000;
+    private long                                 locationSentTime      = -1000;
 
-    private int TAKE_PICTURE_INTERVAL = 120;
-    private long pictureTakenTime = -TAKE_PICTURE_INTERVAL;
+    private int                                  TAKE_PICTURE_INTERVAL = 120;
+    private long                                 pictureTakenTime      = -TAKE_PICTURE_INTERVAL;
     
 	public PtimulusService() {
 		super();
@@ -187,7 +189,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         smsSender.SendSMS("Ptimulus service started.");
 
 
-        for(IEvent event : events) {
+        for(IEvent<?> event : events) {
             event.startListening();
         }
 
@@ -207,7 +209,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
     public void onDestroy() {
         super.onDestroy();
 
-        for(IEvent event : events) {
+        for(IEvent<?> event : events) {
             event.stopListening();
         }
 
@@ -227,7 +229,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
     }
 
     public void timerTick(int counter) {
-        for(IEvent event : events) {
+        for(IEvent<?> event : events) {
             event.tick(counter);
         }
 
@@ -288,7 +290,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
     }
 
     public void batteryEvent(BatteryEvent.BatteryState event) {
-        String text = String.format("%f %f %f", event.temp, event.voltage, event.percent);
+        String text = String.format(Locale.US,"%f %f %f", event.temp, event.voltage, event.percent);
 
         relayLog(LogEntryType.BAT, text);
     }

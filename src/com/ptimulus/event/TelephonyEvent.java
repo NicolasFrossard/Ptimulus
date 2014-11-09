@@ -21,6 +21,8 @@
 
 package com.ptimulus.event;
 
+import java.util.Locale;
+
 import android.content.Context;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
@@ -113,7 +115,7 @@ public class TelephonyEvent implements IEvent<ServiceState> {
     		if(lastServiceState == null)
                 return "No Telephony event yet";
 
-            return String.format("%d sec | %s", Math.round(dataAge() / 1000f), lastServiceState.toString());
+            return String.format(Locale.US, "%d sec | %s", Math.round(dataAge() / 1000f), lastServiceState.toString());
 		}
     }
 
