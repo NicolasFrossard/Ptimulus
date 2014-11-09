@@ -1,5 +1,8 @@
 package com.ptimulus;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -12,12 +15,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class PtimulusActivity extends Activity {
 
@@ -36,7 +35,8 @@ public class PtimulusActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
         int index = 0;
-        LinearLayout ll = new LinearLayout(this);
+        setContentView(R.layout.main);
+        LinearLayout ll = (LinearLayout) findViewById(R.id.mainLayout);
 		ll.setOrientation(LinearLayout.VERTICAL);
         
 		gpsTextView = new TextView(this);
@@ -97,8 +97,6 @@ public class PtimulusActivity extends Activity {
 		logTextView.setText("No log received yet");
 		ll.addView(logTextView, index++);
 		
-		setContentView(ll);
-
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override

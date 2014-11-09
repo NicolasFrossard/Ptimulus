@@ -116,6 +116,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
     private GyroscopeEvent gyroscopeEvent;
     private BatteryEvent batteryEvent;
 	private TelephonyEvent telephonyEvent;
+	private PtimulusCamera mCamera = null;
 
     private final IBinder binder = new PtimulusServiceBinder();
 
@@ -150,6 +151,8 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         events.add(locationEvent = new LocationEvent(this, ctx));
         events.add(telephonyEvent = new TelephonyEvent(this, ctx));
 
+        mCamera = PtimulusCamera.createCamera();
+        
         timerEvent = new TimerEvent(this);
 
         pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -219,7 +222,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         if(counter - pictureTakenTime >= TAKE_PICTURE_INTERVAL)
         {
         	pictureTakenTime = counter;
-            PtimulusCamera.takePicture(this);	
+            mCamera.takePicture(this);	
         }
         
     }
