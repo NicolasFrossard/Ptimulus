@@ -62,6 +62,17 @@ public class PtimulusCamera {
         // devs of the JPEG format said that 100% was useless.
         params.setJpegQuality(90);
 
+        // Set maximum resolution available for the picture
+        Camera.Size maxSize = null;
+        int maxRes = 0;
+        for(Camera.Size size : params.getSupportedPictureSizes()) {
+            if(size.height * size.width > maxRes) {
+                maxRes = size.height * size.width;
+                maxSize = size;
+            }
+        }
+        params.setPictureSize(maxSize.width, maxSize.height);
+
         mCamera.setParameters(params);
 
         mIsInitialized = true;
