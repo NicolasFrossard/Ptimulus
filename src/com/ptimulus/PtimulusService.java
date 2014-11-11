@@ -343,7 +343,7 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         NotificationManager notificationManager = (NotificationManager) ctx
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        Notification n = new Notification(R.drawable.ptimuluslogo,
+        Notification n = new Notification(R.drawable.ic_status_ptimulus,
                 message, System.currentTimeMillis());
 
         n.flags |= Notification.FLAG_ONGOING_EVENT;
