@@ -145,8 +145,8 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
 
     private long                                 locationSentTime      = -1000;
 
-    private int                                  TAKE_PICTURE_INTERVAL = 120;
-    private long                                 pictureTakenTime      = -TAKE_PICTURE_INTERVAL;
+    private int                                  take_picture_interval;
+    private long                                 pictureTakenTime;
     
 	public PtimulusService() {
 		super();
@@ -174,6 +174,8 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
         events.add(locationEvent = new LocationEvent(this, ctx));
         events.add(telephonyEvent = new TelephonyEvent(this, ctx));
 
+        take_picture_interval = Integer.parseInt(preferences.getString("pictureperiod", "20"));
+        pictureTakenTime = -take_picture_interval;
         mCamera = PtimulusCamera.createCamera();
         
         timerEvent = new TimerEvent(this);
@@ -242,12 +244,11 @@ public class PtimulusService extends Service implements OnSharedPreferenceChange
             relayLog(LogEntryType.APP_LIFECYCLE, "Location Sent");
         }
         
-        if(counter - pictureTakenTime >= TAKE_PICTURE_INTERVAL)
+        if(counter - pictureTakenTime >= take_picture_interval)
         {
         	pictureTakenTime = counter;
             mCamera.takePicture(this);	
         }
-        
     }
 
     public void locationEvent(Location l) {

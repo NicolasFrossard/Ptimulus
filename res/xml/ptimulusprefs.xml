@@ -26,15 +26,24 @@ along with Ptimulus.  If not, see <http://www.gnu.org/licenses/>.
         android:summary="Destination phone number of SMS status messages"
         android:title="Report to #1"
         android:key="targetPhoneNumber1"
+        android:inputType="phone"
         android:defaultValue=""/>
     <EditTextPreference
         android:summary="Destination phone number of SMS status messages"
         android:title="Report to #2"
         android:key="targetPhoneNumber2"
+        android:inputType="phone"
         android:defaultValue=""/>
     <EditTextPreference
         android:summary="Destination phone number of SMS status messages"
         android:title="Report to #3"
         android:key="targetPhoneNumber3"
+        android:inputType="phone"
         android:defaultValue=""/>
+    <EditTextPreference
+        android:summary="The number of seconds between each picture take"
+        android:title="Picture time period"
+        android:key="pictureperiod"
+        android:inputType="number"
+        android:defaultValue="20" />
 </PreferenceScreen>
