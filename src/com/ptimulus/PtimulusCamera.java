@@ -47,11 +47,11 @@ public class PtimulusCamera {
     private boolean               mIsInitialized  = false;
     private boolean               mIsLockedCamera = false;
 
-    private PtimulusCamera() {
-        mCamera = Camera.open();
-    }
+    private PtimulusCamera(){ }
 
     public synchronized void init(SurfaceHolder holder) {
+        mCamera = Camera.open();
+
         Camera.Parameters params = mCamera.getParameters();
         params.setWhiteBalance(Parameters.WHITE_BALANCE_AUTO);
         params.setSceneMode(Parameters.SCENE_MODE_AUTO);
@@ -76,6 +76,9 @@ public class PtimulusCamera {
         try {
             mIsInitialized = false;
             mCamera.setPreviewDisplay(null);
+            mCamera.release();
+            mCamera = null;
+            Log.d("CAMERA", "Camera released");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -84,9 +87,6 @@ public class PtimulusCamera {
     @Override
     protected void finalize() throws Throwable {
         deInit();
-        mCamera.release();
-
-        Log.d("CAMERA", "Camera released");
     }
 
     public static synchronized PtimulusCamera createCamera() {
