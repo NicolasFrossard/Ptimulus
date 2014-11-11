@@ -32,19 +32,15 @@ import android.text.format.DateFormat;
  */
 public abstract class DateFactory {
 
-	public static String format(long time) {
-		return DateFormat.format("yyyy-MM-dd kk:mm:ss", time).toString();
+	public static String nowAsString() {
+		return DateFormat.format("yyyy-MM-dd kk:mm:ss", new Date().getTime()).toString();
 	}
 
     public static String nowForFilename() {
         return DateFormat.format("yyyy-MM-dd_kk-mm-ss", new Date().getTime()).toString();
     }
-    
-	public static String nowAsString() {
-		return format(nowAsLong());	
-	}
-	
-	public static Long nowAsLong() {
-		return new Date().getTime();		
-	}
+
+    public static String nowOnlyTime() {
+        return DateFormat.format("kk:mm:ss", new Date().getTime()).toString();
+    }
 }

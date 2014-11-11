@@ -46,7 +46,7 @@ public class ScreenLogger implements IPtimulusLogger {
             return;
 
 		synchronized (lock) {
-			buffer.add(DateFactory.nowAsString() + " | " + type + ": " + entry	+ " ");
+			buffer.add(DateFactory.nowOnlyTime() + " | " + type + ": " + entry	+ " ");
 			if(buffer.size() > QUEUE_SIZE)
                 buffer.remove(0);
 		}
